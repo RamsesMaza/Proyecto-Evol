@@ -1,0 +1,29 @@
+@use './abstracts/variables';
+@use './abstracts/mixins';
+@use './base/reset';
+@use './base/typography';
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+  --primary-color: #C10E1A;
+  --black: #000000;
+}
+
+.container-center {
+  @include mixins.flex-center;
+  min-height: 100vh;
+}
+
+.btn-primary {
+  background-color: variables.$primary-color;
+  color: variables.$white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

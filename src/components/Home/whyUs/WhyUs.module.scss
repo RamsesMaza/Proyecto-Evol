@@ -1,0 +1,54 @@
+@use "../../../styles/abstracts/mixins" as *;
+
+.whyUs {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  padding: 80px 100px;
+  text-align: center;
+
+  h2 {
+    font-size: 32px;
+    margin-bottom: 60px;
+    font-weight: 600;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
+}
+
+.card {
+  text-align: center;
+  padding: 10px 20px;
+
+  svg {
+    font-size: 60px;
+    margin-bottom: 20px;
+    color: #fff;
+    transition: all .3s ease;
+  }
+
+  h3 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0 auto;
+    color: #ddd;
+  }
+
+  &:hover {
+    svg {
+      color: #e8c204;
+      transform: scale(1.1);
+    }
+  }
+}

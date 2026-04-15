@@ -1,0 +1,117 @@
+@use "../../../styles/abstracts/variables" as *;
+@use "../../../styles/abstracts/mixins" as *;
+
+.scheme {
+  padding: 80px 0;
+  background: $white;
+  font-family: $font-primary;
+  display: flex;
+  justify-content: center;
+
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 50px;
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: $black;
+    }
+
+    .line {
+      width: 120px;
+      height: 4px;
+      background: $primary-color;
+      margin: 15px auto 0;
+    }
+  }
+
+  .diagramContainer {
+    width: 100%;
+    margin-bottom: 60px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .downloadSection {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    align-items: center;
+    background: #fdfdfd;
+    padding: 40px;
+    border-radius: 12px;
+    border-left: 5px solid $primary-color;
+
+    .info {
+      h3 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 15px;
+      }
+      .shortLine {
+        width: 60px;
+        height: 3px;
+        background: $primary-color;
+        margin-bottom: 20px;
+      }
+      p {
+        color: #666;
+        line-height: 1.6;
+        font-size: 17px;
+      }
+    }
+
+    .card {
+      @include flex-center;
+      flex-direction: column;
+      text-align: center;
+      padding: 30px;
+      background: $white;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+
+      .icon {
+        font-size: 50px;
+        color: $primary-color;
+        margin-bottom: 10px;
+      }
+
+      .fileName {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 20px;
+      }
+
+      .downloadBtn {
+        background: $black;
+        color: $white;
+        padding: 12px 30px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+
+        &:hover {
+          background: $primary-color;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
