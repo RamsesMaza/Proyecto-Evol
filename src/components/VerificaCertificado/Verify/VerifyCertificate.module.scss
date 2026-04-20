@@ -1,0 +1,237 @@
+@use "../../../styles/abstracts/variables" as *;
+@use "../../../styles/abstracts/mixins" as *;
+
+.verifyCertificate {
+  width: 100%;
+  min-height: 70vh;
+  padding: 120px 0;
+  background:
+    linear-gradient(rgba($black, 0.7), rgba($black, 0.85)),
+    url("../../../assets/img/bg-verify.webp") no-repeat center center / cover;
+  display: flex;
+  align-items: center;
+  color: $white;
+  font-family: $font-primary;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+
+      h1 {
+        font-size: 52px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: -1.5px;
+        margin: 0;
+      }
+
+      .line {
+        width: 100px;
+        height: 4px;
+        background: $primary-color;
+        margin: 25px auto 0;
+        border-radius: 2px;
+      }
+
+      .breadcrumbs {
+        margin-top: 25px;
+        font-size: 14px;
+        color: rgba($white, 0.7);
+
+        a {
+          color: inherit;
+          transition: color 0.3s ease;
+          &:hover {
+            color: $primary-color;
+          }
+        }
+
+        span {
+          color: $primary-color;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .content {
+      max-width: 850px;
+      margin: 0 auto;
+      text-align: center;
+
+      p {
+        font-size: 19px;
+        line-height: 1.7;
+        color: rgba($white, 0.85);
+        margin-bottom: 50px;
+      }
+
+      .verifyForm {
+        background: rgba($white, 0.03);
+        backdrop-filter: blur(12px);
+        padding: 50px;
+        border-radius: 20px;
+        border: 1px solid rgba($white, 0.1);
+        box-shadow: 0 30px 60px rgba($black, 0.4);
+
+        .formGroup {
+          display: flex;
+          gap: 20px;
+          align-items: center;
+
+          .inputWrapper {
+            position: relative;
+            flex: 1;
+
+            .iconInput {
+              position: absolute;
+              left: 18px;
+              top: 50%;
+              transform: translateY(-50%);
+              color: $primary-color;
+              font-size: 22px;
+              z-index: 2;
+            }
+
+            input {
+              width: 100%;
+              padding: 18px 20px 18px 55px;
+              background: $white;
+              border: 2px solid transparent;
+              border-radius: 12px;
+              font-size: 16px;
+              font-weight: 500;
+              color: $black;
+              outline: none;
+              transition: all 0.3s ease;
+
+              &::placeholder {
+                color: #999;
+              }
+              &:focus {
+                border-color: $primary-color;
+                box-shadow: 0 0 20px rgba($primary-color, 0.2);
+              }
+            }
+          }
+
+          .btn {
+            padding: 18px 40px;
+            background: #c10e1a;
+            color: $white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 15px 30px rgba(#c10e1a, 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (min-width: 1367px) {
+    padding: 150px 0;
+    .container {
+      max-width: 1400px;
+    }
+  }
+
+  @media (min-width: 1025px) and (max-width: 1366px) {
+    padding: 100px 0;
+    .container .header h1 {
+      font-size: 42px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 80px 0;
+    .container {
+      .header h1 {
+        font-size: 38px;
+      }
+      .content .verifyForm {
+        padding: 35px;
+      }
+    }
+  }
+
+  @media (min-width: 481px) and (max-width: 767px) {
+    padding: 70px 0;
+    .container {
+      .header h1 {
+        font-size: 32px;
+      }
+      .content {
+        p {
+          font-size: 16px;
+        }
+        .verifyForm {
+          padding: 30px;
+          .formGroup {
+            flex-direction: column;
+            .btn {
+              width: 100%;
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (min-width: 320px) and (max-width: 480px) {
+    padding: 60px 0;
+    .container {
+      .header {
+        h1 {
+          font-size: 26px;
+          line-height: 1.2;
+        }
+        .breadcrumbs {
+          display: none;
+        }
+      }
+      .content {
+        p {
+          font-size: 14px;
+          margin-bottom: 30px;
+        }
+        .verifyForm {
+          padding: 20px;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+          .formGroup {
+            flex-direction: column;
+            gap: 15px;
+            .inputWrapper input {
+              padding: 15px 15px 15px 45px;
+              font-size: 14px;
+            }
+            .btn {
+              width: 100%;
+              padding: 15px;
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

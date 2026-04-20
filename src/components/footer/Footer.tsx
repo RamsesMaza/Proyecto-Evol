@@ -12,7 +12,6 @@ const Footer: React.FC = () => {
       style={{ backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${bg})` }}
     >
       <div className={styles.container}>
-        {/* LEFT */}
         <div className={styles.left}>
           <img src={ACS} alt="ACS Logo" className={styles.logo} />
 
@@ -24,7 +23,6 @@ const Footer: React.FC = () => {
           </p>
         </div>
 
-        {/* CENTER */}
         <div className={styles.links}>
           <h3>Enlaces Rápidos</h3>
 
@@ -40,7 +38,6 @@ const Footer: React.FC = () => {
           <button className={styles.verifyBtn}>Verifica tu certificado</button>
         </div>
 
-        {/* RIGHT */}
         <div className={styles.contact}>
           <h3>Información de Contacto</h3>
 

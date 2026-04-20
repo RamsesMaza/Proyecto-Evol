@@ -2,43 +2,40 @@
 @use "../../../styles/abstracts/mixins" as *;
 
 .clients {
-  padding: 50px 0;
+  padding: 80px 0;
   background-color: $white;
   overflow: hidden;
+  position: relative;
 
   .container {
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 60px;
   }
 
   .content {
     display: grid;
     grid-template-columns: 0.8fr 1.2fr;
-    gap: 60px;
+    gap: 80px;
     align-items: center;
-
-    @media (max-width: 992px) {
-      grid-template-columns: 1fr;
-      text-align: center;
-    }
   }
 
   .text {
     h2 {
-      font-size: 26px;
-      font-weight: 700;
-      color: #333;
-      line-height: 1.3;
+      font-size: 32px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
     }
+
     .line {
-      width: 60px;
+      width: 80px;
       height: 4px;
       background-color: $primary-color;
-      margin-top: 15px;
-      @media (max-width: 992px) {
-        margin: 15px auto 0;
-      }
+      margin-top: 20px;
+      border-radius: 2px;
     }
   }
 
@@ -46,32 +43,36 @@
     width: 100%;
     overflow: hidden;
     position: relative;
+    padding: 20px 0;
 
     &::before,
     &::after {
       content: "";
       position: absolute;
       top: 0;
-      width: 50px;
+      width: 100px;
       height: 100%;
       z-index: 2;
+      pointer-events: none;
     }
+
     &::before {
       left: 0;
-      background: linear-gradient(to right, $white, transparent);
+      background: linear-gradient(to right, $white 20%, transparent);
     }
+
     &::after {
       right: 0;
-      background: linear-gradient(to left, $white, transparent);
+      background: linear-gradient(to left, $white 20%, transparent);
     }
   }
 
   .track {
     display: flex;
     align-items: center;
-    gap: 60px;
+    gap: 80px;
     width: fit-content;
-    animation: scroll 15s linear infinite;
+    animation: scroll 25s linear infinite;
 
     &:hover {
       animation-play-state: paused;
@@ -80,20 +81,21 @@
 
   .logoItem {
     flex-shrink: 0;
-    width: 180px;
+    width: 160px;
     @include flex-center;
+    transition: all 0.4s ease;
 
     img {
       max-width: 100%;
       height: auto;
       filter: grayscale(100%);
-      opacity: 0.6;
-      transition: all 0.4s ease;
+      opacity: 0.4;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
         filter: grayscale(0);
         opacity: 1;
-        transform: scale(1.05);
+        transform: scale(1.1);
       }
     }
   }
@@ -104,6 +106,141 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-50% - 30px));
+    transform: translateX(calc(-50% - 40px));
+  }
+}
+
+
+@media (min-width: 1367px) {
+  .clients {
+    padding: 100px 0;
+    .container {
+      padding: 0 100px;
+    }
+  }
+}
+
+@media (min-width: 1281px) and (max-width: 1366px) {
+  .clients {
+    padding: 80px 0;
+    .container {
+      padding: 0 60px;
+    }
+    .text h2 {
+      font-size: 28px;
+    }
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .clients {
+    padding: 70px 0;
+    .container {
+      padding: 0 40px;
+    }
+    .content {
+      gap: 40px;
+    }
+    .text h2 {
+      font-size: 24px;
+    }
+    .logoItem {
+      width: 140px;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .clients {
+    padding: 60px 0;
+    .container {
+      padding: 0 30px;
+    }
+    .content {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 40px;
+    }
+    .text {
+      .line {
+        margin: 15px auto 0;
+      }
+      h2 {
+        font-size: 26px;
+      }
+    }
+    .sliderContainer::before,
+    .sliderContainer::after {
+      width: 60px;
+    }
+    .track {
+      gap: 60px;
+    }
+  }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .clients {
+    padding: 50px 0;
+    .container {
+      padding: 0 20px;
+    }
+    .content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .text h2 {
+      font-size: 22px;
+    }
+    .text .line {
+      margin: 12px auto 0;
+      width: 60px;
+    }
+    .logoItem {
+      width: 120px;
+    }
+    .track {
+      gap: 40px;
+    }
+    .sliderContainer::before,
+    .sliderContainer::after {
+      width: 40px;
+    }
+  }
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .clients {
+    padding: 40px 0;
+    .container {
+      padding: 0 15px;
+    }
+    .content {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 30px;
+    }
+    .text h2 {
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    .text .line {
+      margin: 10px auto 0;
+      width: 50px;
+      height: 3px;
+    }
+    .logoItem {
+      width: 100px;
+    }
+    .track {
+      gap: 30px;
+      animation-duration: 12s;
+    }
+    .sliderContainer::before,
+    .sliderContainer::after {
+      width: 30px;
+    }
+
+
   }
 }
