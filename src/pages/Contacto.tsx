@@ -1,10 +1,15 @@
+import ContactHero from "../components/Contacto/ContactHero/ContactHero";
+import ContactCards from "../components/Contacto/ContactCards/ContactCards";
+import ContactMainSection from "../components/Contacto/ContactMainSection/ContactMainSection";
 
 const Contacto = () => {
   return (
-    <div>
+    <main>
+      <ContactHero />
+      <ContactCards />
+      <ContactMainSection />
+    </main>
+  );
+};
 
-    </div>
-  )
-}
-
-export default Contacto
+export default Contacto;

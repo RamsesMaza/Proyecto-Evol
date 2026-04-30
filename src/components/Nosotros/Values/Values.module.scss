@@ -1,0 +1,78 @@
+@use "../../../styles/abstracts/variables" as *;
+@use "../../../styles/abstracts/mixins" as *;
+
+.values {
+  padding: 80px 0;
+  background: #f4f7f9;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 36px);
+    margin-bottom: 50px;
+    position: relative;
+    &::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: $primary-color;
+      margin: 15px auto 0;
+    }
+  }
+
+  .grid {
+    display: grid;
+    // Esto crea columnas de al menos 280px, pero si no caben, las pone una debajo de otra
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 30px;
+    width: 100%;
+  }
+
+  .card {
+    background: $white;
+    padding: 40px 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      border-color: $primary-color;
+    }
+
+    .icon {
+      font-size: 45px;
+      color: $primary-color;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: $black;
+    }
+
+    p {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+    }
+  }
+}
+
+// Ajuste para móviles muy pequeños (evita que el padding rompa el layout)
+@media (max-width: 480px) {
+  .values {
+    padding: 50px 0;
+    .grid { gap: 20px; }
+    .card { padding: 30px 15px; }
+  }
+}
