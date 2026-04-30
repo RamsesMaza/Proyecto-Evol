@@ -1,0 +1,181 @@
+$primary: #C10E1A;
+$primary-dark: #8c0a12;
+$dark: #0f0f0f;
+$dark-2: #1a1a1a;
+$text: #333;
+$text-light: #666;
+$white: #fff;
+
+.solicitudes { font-family: 'Poppins', sans-serif; }
+
+// ── HERO ──────────────────────────────────────────
+.hero {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: $dark;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba($primary, 0.15) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 90px 40px 60px;
+  color: $white;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: $primary;
+  background: rgba($primary, 0.1);
+  border: 1px solid rgba($primary, 0.3);
+  padding: 6px 16px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.heroContent h1 {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 700;
+  margin: 0 0 16px;
+  line-height: 1.1;
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: $primary;
+    border-radius: 2px;
+    margin-top: 16px;
+  }
+}
+
+.heroContent p {
+  font-size: 1.05rem;
+  color: rgba($white, 0.65);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: rgba($white, 0.5);
+  a { color: rgba($white, 0.7); text-decoration: none; transition: color 0.2s; &:hover { color: $primary; } }
+  span:last-child { color: $primary; }
+}
+
+// ── CARDS ─────────────────────────────────────────
+.cardsSection { background: #f8f8f8; padding: 80px 0; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  @media (max-width: 900px) { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+}
+
+.card {
+  background: $white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    .cardIcon { background: $primary; color: $white; }
+    .cardAccent { width: 100%; }
+  }
+}
+
+.cardAccent {
+  position: absolute;
+  top: 0; left: 0;
+  height: 3px;
+  width: 60px;
+  background: $primary;
+  transition: width 0.4s ease;
+}
+
+.cardTop { display: flex; justify-content: space-between; align-items: flex-start; padding: 28px 28px 0; }
+
+.cardNumber { font-size: 3rem; font-weight: 800; color: rgba($primary, 0.1); line-height: 1; }
+
+.cardIcon {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  background: rgba($primary, 0.08);
+  color: $primary;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  transition: background 0.3s, color 0.3s;
+}
+
+.cardBody { padding: 20px 28px; flex: 1; }
+.cardEyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: $primary; margin-bottom: 8px; }
+.cardBody h2 { font-size: 1.2rem; font-weight: 700; color: $dark; margin-bottom: 12px; }
+.cardDesc { font-size: 0.88rem; color: $text-light; line-height: 1.7; margin-bottom: 20px; }
+
+.benefits {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  li { display: flex; align-items: center; gap: 10px; font-size: 0.84rem; color: $text;
+    svg { color: $primary; font-size: 0.78rem; flex-shrink: 0; } }
+}
+
+.cardFooter { padding: 20px 28px 28px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: $primary; color: $white;
+  padding: 12px 22px; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, gap 0.2s;
+  width: 100%; justify-content: center;
+  &:hover { background: $primary-dark; gap: 12px; }
+}
+
+// ── CTA BANNER ────────────────────────────────────
+.ctaBanner {
+  background: linear-gradient(135deg, $dark 0%, $dark-2 100%);
+  padding: 70px 0;
+  text-align: center;
+  color: $white;
+  h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; margin-bottom: 12px; }
+  p { color: rgba($white, 0.6); font-size: 1rem; margin-bottom: 28px; }
+}
+
+.ctaBtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: $primary; color: $white;
+  padding: 14px 32px; border-radius: 8px;
+  font-size: 1rem; font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+  &:hover { background: $primary-dark; }
+}
