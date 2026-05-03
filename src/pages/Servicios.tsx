@@ -1,10 +1,13 @@
+import ServiciosHero from "../components/Servicios/ServiciosHero/ServiciosHero";
+import IsoCatalog from "../components/Servicios/IsoCatalog/IsoCatalog";
 
 const Servicios = () => {
   return (
-    <div>
-    
-    </div>
-  )
-}
+    <main>
+      <ServiciosHero />
+      <IsoCatalog />
+    </main>
+  );
+};
 
-export default Servicios
+export default Servicios;

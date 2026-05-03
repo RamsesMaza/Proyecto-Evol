@@ -1,10 +1,11 @@
+import BlogSection from "../components/Blog/BlogSection/BlogSection";
 
-const blog = () => {
+const Blog = () => {
   return (
     <div>
-
+      <BlogSection />
     </div>
-  )
-}
+  );
+};
 
-export default blog
+export default Blog;

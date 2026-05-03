@@ -1,0 +1,51 @@
+@use "../../../styles/abstracts/variables" as *;
+@use "../../../styles/abstracts/mixins" as *;
+
+.hero {
+  position: relative;
+  height: 45vh;
+  min-height: 400px;
+  overflow: hidden;
+  @include flex-center;
+  text-align: center;
+  color: $white;
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    background: url("../../../assets/img/hero2.webp") no-repeat center center / cover;
+    animation: zoomEffect 15s ease-in-out infinite alternate;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba($black, 0.8), rgba($primary-color, 0.4));
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    h1 { 
+      font-size: clamp(36px, 6vw, 56px); 
+      text-transform: uppercase; 
+      margin-bottom: 15px; 
+      font-family: $font-primary;
+    }
+    .divider { 
+      width: 60px; 
+      height: 4px; 
+      background: $primary-color; 
+      margin: 0 auto 20px; 
+    }
+    p { 
+      font-size: 18px; 
+      opacity: 0.9; 
+    }
+  }
+}
+
+@keyframes zoomEffect {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
