@@ -216,7 +216,7 @@ const Header: React.FC = () => {
           </nav>
 
           <div className={styles.actions}>
-            <button className={styles.loginBtn}>Login</button>
+            <Link to="/login" className={styles.loginBtn}>Login</Link>
             <button className={styles.btn}>
               <NavLink to="/verifica-tu-certificado" className={styles.btn}>
                 Verifica tu certificado
