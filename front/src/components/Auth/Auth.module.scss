@@ -588,6 +588,53 @@
 }
 
 /* Checkbox Profesional */
+.otpContainer {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.otpInput {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border: 2px solid #e1e1e1;
+  border-radius: 10px;
+  background: #f5f6f8;
+  color: #111;
+  font-family: $font-primary;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #e53e3e;
+    box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.15);
+    background: $white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: $white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .checkboxGroup {
   margin-bottom: 25px;
   

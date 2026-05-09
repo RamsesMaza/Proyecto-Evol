@@ -35,7 +35,7 @@ export const verifyRecaptcha = async (token: string): Promise<boolean> => {
       }).toString(),
     });
     
-    const data = await res.json();
+    const data = (await res.json()) as { success: boolean; score: number };
     console.log('reCAPTCHA verification response:', data);
     return data.success && data.score >= 0.5; // Score >= 0.5 significa que probablemente es humano
   } catch (error) {

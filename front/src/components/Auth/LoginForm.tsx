@@ -30,11 +30,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
       return;
     }
 
+    const captchaToken = await executeRecaptcha('login');
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, captchaToken: token })
+        body: JSON.stringify({ email, password, captchaToken })
       });
       const data = await res.json();
       

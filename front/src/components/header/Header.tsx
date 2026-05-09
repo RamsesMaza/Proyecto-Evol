@@ -170,7 +170,6 @@ const Header: React.FC = () => {
                   </Link>
                 </div>
 
-                {/* Columna 4 */}
                 <div>
                   <h4>Cursos PMI</h4>
                   <Link to="/pmi/construccion" onClick={closeMenu}>
