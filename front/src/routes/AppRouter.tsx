@@ -8,6 +8,10 @@ import Contacto from '../pages/Contacto';
 import Blog from '../pages/Blog';
 import VerifyCertificate from '../pages/VerifyCertificate';
 import Auth from '../pages/Auth';
+import ProductDetail from '../pages/ProductDetail';
+import Checkout from '../pages/Checkout';
+import OrderConfirmation from '../pages/OrderConfirmation';
+import PendingPayment from '../pages/PendingPayment';
 
 const AppRouter = () => {
   return (
@@ -20,6 +24,10 @@ const AppRouter = () => {
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/verifica-tu-certificado" element={<VerifyCertificate/>}/>
       <Route path="/login" element={<Auth />} />
+      <Route path="/producto/:id" element={<ProductDetail />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/checkout/success" element={<OrderConfirmation />} />
+      <Route path="/checkout/pending-payment" element={<PendingPayment />} />
       <Route path="*" element={<div style={{padding: "100px"}}>404 - No encontrado</div>} />
     </Routes>
   );

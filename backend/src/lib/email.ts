@@ -80,3 +80,60 @@ export const sendOtpEmail = async (to: string, code: string): Promise<void> => {
     html: buildHtml(code),
   });
 };
+
+export const sendInvoiceEmail = async (
+  to: string,
+  pdfBuffer: Buffer,
+  orderId: number,
+): Promise<void> => {
+  if (!smtpConfigured || !transporter) {
+    console.log(`\n===========================================`);
+    console.log(`[DEV] Factura enviada a: ${to}`);
+    console.log(`[DEV] Orden #${orderId} - PDF generado (${(pdfBuffer.length / 1024).toFixed(1)} KB)`);
+    console.log(`[DEV] SMTP no configurado. El PDF se guardó en memoria.`);
+    console.log(`===========================================\n`);
+    return;
+  }
+
+  await transporter.sendMail({
+    from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    to,
+    subject: `Recibo de compra - Orden #${orderId}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><style>
+  body { margin:0; padding:0; background:#f4f4f4; font-family:Arial,Helvetica,sans-serif; }
+  .container { max-width:560px; margin:40px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+  .header { background:#C10E1A; padding:30px; text-align:center; }
+  .header h1 { color:#fff; margin:0; font-size:22px; }
+  .body { padding:40px 30px; text-align:center; }
+  .body h2 { color:#333; margin:0 0 10px; font-size:20px; }
+  .body p { color:#666; font-size:15px; line-height:1.6; margin:0 0 10px; }
+  .footer { padding:20px 30px; text-align:center; background:#fafafa; border-top:1px solid #eee; }
+  .footer p { color:#999; font-size:12px; margin:4px 0; }
+</style></head>
+<body>
+  <div class="container">
+    <div class="header"><h1>${appName}</h1></div>
+    <div class="body">
+      <h2>¡Gracias por tu compra!</h2>
+      <p>Hemos recibido tu pedido <strong>#${orderId}</strong>.</p>
+      <p>Adjunto encontrarás tu comprobante de pago en PDF.</p>
+      <p style="color:#999;font-size:13px;margin-top:20px;">Si tienes alguna consulta, responde a este correo.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; ${new Date().getFullYear()} ${appName}. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>`,
+    attachments: [
+      {
+        filename: `recibo-${orderId}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
+      },
+    ],
+  });
+};

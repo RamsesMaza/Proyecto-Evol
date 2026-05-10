@@ -20,24 +20,22 @@ export const generateToken = (payload: object) => {
 export const verifyRecaptcha = async (token: string): Promise<boolean> => {
   if (!RECAPTCHA_SECRET) {
     console.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación de reCAPTCHA.');
-    return true; // En modo desarrollo si no hay key, lo dejamos pasar.
+    return true;
   }
 
   try {
-    const res = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+    const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        secret: RECAPTCHA_SECRET,
-        response: token
-      }).toString(),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: RECAPTCHA_SECRET, response: token }).toString(),
     });
-    
-    const data = (await res.json()) as { success: boolean; score: number };
-    console.log('reCAPTCHA verification response:', data);
-    return data.success && data.score >= 0.5; // Score >= 0.5 significa que probablemente es humano
+
+    const data = (await res.json()) as { success: boolean; score?: number };
+    console.log('[reCAPTCHA]', JSON.stringify(data));
+
+    if (!data.success) return false;
+    if (typeof data.score === 'number') return data.score >= 0.5;
+    return true;
   } catch (error) {
     console.error('Error verificando reCAPTCHA:', error);
     return false;

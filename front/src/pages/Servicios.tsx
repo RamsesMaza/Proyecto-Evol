@@ -1,11 +1,11 @@
 import ServiciosHero from "../components/Servicios/ServiciosHero/ServiciosHero";
-import IsoCatalog from "../components/Servicios/IsoCatalog/IsoCatalog";
+import CatalogPage from "../components/Catalogo/CatalogPage";
 
 const Servicios = () => {
   return (
     <main>
       <ServiciosHero />
-      <IsoCatalog />
+      <CatalogPage />
     </main>
   );
 };

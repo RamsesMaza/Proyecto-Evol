@@ -39,3 +39,96 @@ model OtpCode {
   @@index([email, code])
   @@index([email])
 }
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  products    Product[]
+}
+
+model Product {
+  id             Int       @id @default(autoincrement())
+  title          String
+  name           String
+  description    String
+  fullDescription String?   @db.Text
+  price          Float     @default(0)
+  oldPrice       Float?
+  categoryId     Int
+  category       Category  @relation(fields: [categoryId], references: [id])
+  image          String?
+  images         String?   @db.Text
+  stock          Int       @default(0)
+  isNew          Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  isOffer        Boolean   @default(false)
+  rating         Float     @default(0)
+  reviewCount    Int       @default(0)
+  specs          String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  reviews        Review[]
+  orderItems     OrderItem[]
+
+  @@index([categoryId])
+  @@index([title])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  userName  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  userId         Int?
+  customerName   String
+  customerEmail  String
+  customerPhone  String?
+  customerAddress String?
+  customerCity   String?
+  customerZip    String?
+  shippingMethod String      @default("delivery")
+  paymentMethod  String
+  paymentDetail  String?     @db.Text
+  paymentStatus  String      @default("pending")
+  status         String      @default("pending")
+  subtotal       Float       @default(0)
+  tax            Float       @default(0)
+  shipping       Float       @default(0)
+  discount       Float       @default(0)
+  couponCode     String?
+  total          Float       @default(0)
+  notes          String?
+  billingType    String?
+  billingRuc     String?
+  billingName    String?
+  billingAddress String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+  price     Float
+
+  @@index([orderId])
+  @@index([productId])
+}
