@@ -74,7 +74,7 @@ router.post('/login', async (req: Request, res: Response) => {
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
       token,
-      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName },
+      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, phone: user.phone, company: user.company },
     });
   } catch (error) {
     console.error('Error en login:', error);

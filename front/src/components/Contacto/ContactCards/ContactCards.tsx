@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaClock } from "react-icons/fa";
 import styles from "./ContactCards.module.scss";
 
@@ -9,16 +10,29 @@ const data = [
 ];
 
 const ContactCards = () => {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); observer.disconnect(); }
+    }, { threshold: 0.15 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className={styles.cardsSection}>
+    <section ref={ref} className={styles.section}>
       <div className={styles.container}>
         <div className={styles.grid}>
           {data.map((item, i) => (
-            <div key={i} className={styles.card}>
-              <div className={styles.icon}>{item.icon}</div>
-              <h3>{item.title}</h3>
-              <p className={styles.desc}>{item.desc}</p>
-              <p className={styles.sub}>{item.sub}</p>
+            <div key={i} className={`${styles.card} ${visible ? styles.enter : ''}`} style={{ animationDelay: `${i * 0.12}s` }}>
+              <div className={styles.iconWrap}>{item.icon}</div>
+              <h3 className={styles.cardTitle}>{item.title}</h3>
+              <p className={styles.cardDesc}>{item.desc}</p>
+              <p className={styles.cardSub}>{item.sub}</p>
             </div>
           ))}
         </div>

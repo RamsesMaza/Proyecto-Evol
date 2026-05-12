@@ -44,7 +44,7 @@ const Auth: React.FC = () => {
 
         <div className={styles.authFormContainer}>
           <div className={styles.formInnerWrapper}>
-            {mode === 'login' && <LoginForm onSwitchMode={setMode} onSuccess={handleShowModal} />}
+            {mode === 'login' && <LoginForm onSwitchMode={setMode} onSuccess={(msg, title, onClose) => { handleShowModal(<p>{msg}</p>, title || 'Mensaje', onClose); }} />}
             {mode === 'register' && <RegisterForm onSwitchMode={setMode} onSuccess={handleShowModal} onShowTerms={handleShowModal} />}
             {mode === 'forgot_password' && <ForgotPasswordForm onSwitchMode={setMode} onSuccess={handleShowModal} />}
           </div>

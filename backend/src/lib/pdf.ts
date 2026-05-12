@@ -94,30 +94,31 @@ export async function generateInvoice(data: InvoiceData): Promise<Buffer> {
     // ───── PAYMENT ─────
     y = 210;
     const hasSplit = !!data.paymentDetail?.firstPayment;
-    const pmBoxH = hasSplit ? 52 : 26;
+    const pmBoxH = hasSplit ? 60 : 26;
     doc.rect(ml, y, W, pmBoxH).fill(light).stroke('#e5e7eb');
     doc.fill(red).fontSize(8).font('Helvetica-Bold').text('MÉTODO DE PAGO', ml + 12, y + 6);
-    doc.fill(dark).fontSize(8).font('Helvetica').text(methodLabels[data.paymentMethod] || data.paymentMethod, ml + 12, y + 20);
     if (hasSplit) {
       const fp = data.paymentDetail!.firstPayment!;
       const sp = data.paymentDetail!.secondPayment!;
-      doc.fontSize(7.5).fill(gray).font('Helvetica')
-        .text(`1° ${fp.method === 'tarjeta' ? 'Tarjeta' : 'Efectivo'}:`, 200, y + 20);
-      doc.fontSize(8).fill(dark).font('Helvetica-Bold').text(fmt(fp.amount), 290, y + 20);
-      if (fp.code) doc.fontSize(7).fill(red).font('Helvetica').text(`Código: ${fp.code}`, 340, y + 20);
-      doc.fontSize(7.5).fill(gray).font('Helvetica')
-        .text(`2° ${sp?.method === 'tarjeta' ? 'Tarjeta' : 'Efectivo'}:`, 200, y + 36);
-      doc.fontSize(8).fill(dark).font('Helvetica-Bold').text(fmt(sp?.amount ?? 0), 290, y + 36);
-      if (sp?.date) doc.fontSize(7).fill(gray).font('Helvetica').text(`Fecha: ${sp.date}`, 340, y + 36);
+      doc.fill(dark).fontSize(8).font('Helvetica')
+        .text('Mixto: 1° ' + (fp.method === 'tarjeta' ? 'Tarjeta' : 'Efectivo'), ml + 12, y + 22);
+      doc.fontSize(8).fill(dark).font('Helvetica-Bold').text(fmt(fp.amount), ml + 130, y + 22);
+      if (fp.code) doc.fontSize(7).fill(red).font('Helvetica').text(`Código: ${fp.code}`, ml + 200, y + 22);
+      doc.fill(gray).fontSize(7.5).font('Helvetica')
+        .text('2° ' + (sp?.method === 'tarjeta' ? 'Tarjeta' : 'Efectivo'), ml + 12, y + 40);
+      doc.fontSize(8).fill(dark).font('Helvetica-Bold').text(fmt(sp?.amount ?? 0), ml + 130, y + 40);
+      if (sp?.date) doc.fontSize(7).fill(gray).font('Helvetica').text(`Fecha: ${sp.date}`, ml + 200, y + 40);
       const details = sp?.details?.toLowerCase() || '';
       if (details.includes('depósito') || details.includes('transferencia')) {
         doc.fontSize(6.5).fill('#166534')
-          .text('BCP Cta.Cte.: 191-2345678-0-00 · CCI: 002-191-123456780000-00', 200, y + 20, { width: W - 190 });
+          .text('BCP Cta.Cte.: 191-2345678-0-00 · CCI: 002-191-123456780000-00', ml + 12, y + 52, { width: W - 24 });
       }
+    } else {
+      doc.fill(dark).fontSize(8).font('Helvetica').text(methodLabels[data.paymentMethod] || data.paymentMethod, ml + 12, y + 22);
     }
 
     // ───── ITEMS TABLE ─────
-    y = 244 + (hasSplit ? 24 : 0);
+    y = 278;
     const cols = [ml + 12, 210, 330, 400];
     const hdrs = ['Producto / Servicio', 'Precio', 'Cant', 'Total'];
     doc.rect(ml, y, W, 18).fill(dark);

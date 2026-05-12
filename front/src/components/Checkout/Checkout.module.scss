@@ -1,0 +1,13 @@
+@use "../../styles/abstracts/variables" as *;
+
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: $font-primary;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}

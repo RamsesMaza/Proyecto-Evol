@@ -6,13 +6,14 @@ import Footer from "./components/footer/Footer";
 import { FaWhatsapp, FaShoppingCart } from "react-icons/fa";
 import { CartProvider } from "./context/CartContext";
 import { ToastProvider } from "./context/ToastContext";
+import { AuthProvider } from "./context/AuthContext";
 import CartDrawer from "./components/CartDrawer/CartDrawer";
 
 import styles from "./app.module.scss";
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/login";
+  const isAuthPage = location.pathname === "/login" || location.pathname.startsWith("/panel");
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
@@ -55,11 +56,13 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <ToastProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </ToastProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </ToastProvider>
+      </AuthProvider>
     </Router>
   );
 }

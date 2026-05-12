@@ -3,8 +3,8 @@
 
 .hero {
   position: relative;
-  height: 45vh;
-  min-height: 400px;
+  height: 55vh;
+  min-height: 420px;
   overflow: hidden;
   @include flex-center;
   text-align: center;
@@ -20,19 +20,66 @@
   .overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba($black, 0.8), rgba($black, 0.4));
+    background: linear-gradient(135deg, rgba(0,0,0,0.82) 0%, rgba(193,14,26,0.3) 50%, rgba(0,0,0,0.55) 100%);
   }
 
   .content {
     position: relative;
     z-index: 2;
-    h1 { font-size: clamp(36px, 6vw, 56px); text-transform: uppercase; margin-bottom: 15px; }
-    .divider { width: 60px; height: 4px; background: $primary-color; margin: 0 auto 20px; }
-    p { font-size: 18px; opacity: 0.9; }
+    max-width: 700px;
+    padding: 0 24px;
+    animation: fadeUp 0.8s ease;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .title {
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 800;
+    margin: 0 0 16px;
+    letter-spacing: -1px;
+  }
+
+  .divider {
+    width: 64px;
+    height: 4px;
+    background: $primary-color;
+    margin: 0 auto 20px;
+    border-radius: 2px;
+  }
+
+  .sub {
+    font-size: clamp(16px, 2vw, 19px);
+    font-weight: 400;
+    opacity: 0.8;
+    line-height: 1.6;
+    margin: 0;
   }
 }
 
 @keyframes zoomEffect {
   from { transform: scale(1); }
   to { transform: scale(1.1); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .hero { height: 50vh; min-height: 360px; }
 }

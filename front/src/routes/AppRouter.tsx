@@ -6,12 +6,14 @@ import Solicitudes from '../pages/Solicitudes';
 import Servicios from '../pages/Servicios';
 import Contacto from '../pages/Contacto';
 import Blog from '../pages/Blog';
+import BlogPost from '../pages/BlogPost';
 import VerifyCertificate from '../pages/VerifyCertificate';
 import Auth from '../pages/Auth';
 import ProductDetail from '../pages/ProductDetail';
 import Checkout from '../pages/Checkout';
 import OrderConfirmation from '../pages/OrderConfirmation';
 import PendingPayment from '../pages/PendingPayment';
+import UserPanel from '../pages/UserPanel';
 
 const AppRouter = () => {
   return (
@@ -21,6 +23,7 @@ const AppRouter = () => {
       <Route path="/solicitudes/*" element={<Solicitudes />} />
       <Route path="/servicios" element={<Servicios />} />
       <Route path="/blog" element={<Blog/>} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/verifica-tu-certificado" element={<VerifyCertificate/>}/>
       <Route path="/login" element={<Auth />} />
@@ -28,6 +31,7 @@ const AppRouter = () => {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/checkout/success" element={<OrderConfirmation />} />
       <Route path="/checkout/pending-payment" element={<PendingPayment />} />
+      <Route path="/panel" element={<UserPanel />} />
       <Route path="*" element={<div style={{padding: "100px"}}>404 - No encontrado</div>} />
     </Routes>
   );

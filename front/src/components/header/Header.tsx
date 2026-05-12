@@ -13,9 +13,11 @@ import {
 } from "react-icons/fa";
 
 import ACS from "../../assets/logos/Logo-Acs.webp";
+import { useAuth } from "../../context/AuthContext";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -215,7 +217,20 @@ const Header: React.FC = () => {
           </nav>
 
           <div className={styles.actions}>
-            <Link to="/login" className={styles.loginBtn}>Login</Link>
+            {isAuthenticated ? (
+              <Link to="/panel" className={styles.loginBtn} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{
+                  width: 28, height: 28, borderRadius: '50%', background: '#C10E1A',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 700, color: '#fff',
+                }}>
+                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                </span>
+                {user?.firstName}
+              </Link>
+            ) : (
+              <Link to="/login" className={styles.loginBtn}>Login</Link>
+            )}
             <button className={styles.btn}>
               <NavLink to="/verifica-tu-certificado" className={styles.btn}>
                 Verifica tu certificado

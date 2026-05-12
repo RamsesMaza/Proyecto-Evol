@@ -6,9 +6,10 @@ const ContactHero = () => {
       <div className={styles.slide} />
       <div className={styles.overlay} />
       <div className={styles.content}>
-        <h1>Contáctanos</h1>
+        <span className={styles.badge}>Comunícate con nosotros</span>
+        <h1 className={styles.title}>Contáctanos</h1>
         <div className={styles.divider} />
-        <p>Expertos en certificación ISO a tu disposición.</p>
+        <p className={styles.sub}>Expertos en certificación ISO a tu disposición.</p>
       </div>
     </section>
   );

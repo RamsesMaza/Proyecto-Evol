@@ -2,77 +2,142 @@
 @use "../../../styles/abstracts/mixins" as *;
 
 .values {
-  padding: 80px 0;
-  background: #f4f7f9;
+  padding: 100px 0;
+  background: #f8fafc;
+  position: relative;
+  overflow: hidden;
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-  }
-
-  h2 {
-    font-size: clamp(28px, 4vw, 36px);
-    margin-bottom: 50px;
-    position: relative;
-    &::after {
-      content: "";
-      display: block;
-      width: 60px;
-      height: 3px;
-      background: $primary-color;
-      margin: 15px auto 0;
-    }
-  }
-
-  .grid {
-    display: grid;
-    // Esto crea columnas de al menos 280px, pero si no caben, las pone una debajo de otra
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-    gap: 30px;
-    width: 100%;
-  }
-
-  .card {
-    background: $white;
-    padding: 40px 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 1px solid #eee;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      border-color: $primary-color;
-    }
-
-    .icon {
-      font-size: 45px;
-      color: $primary-color;
-      margin-bottom: 20px;
-    }
-
-    h3 {
-      font-size: 20px;
-      margin-bottom: 15px;
-      color: $black;
-    }
-
-    p {
-      font-size: 15px;
-      color: #666;
-      line-height: 1.6;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(193, 14, 26, 0.03);
+    pointer-events: none;
   }
 }
 
-// Ajuste para móviles muy pequeños (evita que el padding rompa el layout)
-@media (max-width: 480px) {
-  .values {
-    padding: 50px 0;
-    .grid { gap: 20px; }
-    .card { padding: 30px 15px; }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 56px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.sectionBadge {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 50px;
+  background: rgba(193, 14, 26, 0.08);
+  color: $primary-color;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.sectionDesc {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.card {
+  background: $white;
+  padding: 44px 32px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
+  transition: all 0.4s ease;
+  border: 1px solid #f1f5f9;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+
+  &.cardEnter {
+    animation: cardFadeUp 0.6s ease forwards;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 32px rgba(193, 14, 26, 0.1);
+    border-color: rgba(193, 14, 26, 0.15);
+  }
+}
+
+.iconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(193,14,26,0.08) 0%, rgba(193,14,26,0.02) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: $primary-color;
+  margin: 0 auto 20px;
+  transition: all 0.4s ease;
+
+  .card:hover & {
+    background: linear-gradient(135deg, $primary-color 0%, #e03a45 100%);
+    color: $white;
+    box-shadow: 0 8px 24px rgba(193, 14, 26, 0.25);
+    transform: scale(1.05);
+  }
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+
+.cardDesc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #64748b;
+  margin: 0;
+}
+
+@keyframes cardFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .values { padding: 60px 0; }
+  .grid { gap: 20px; }
+  .card { padding: 32px 20px; }
 }

@@ -1,0 +1,209 @@
+@use "../../styles/abstracts/variables" as *;
+
+.page {
+  font-family: $font-primary;
+  background: #f8f9fb;
+  min-height: 100vh;
+}
+
+.notFound {
+  text-align: center; padding: 100px 20px;
+  h1 { font-size: 28px; color: #0f172a; margin-bottom: 20px; }
+  .backLink { display: inline-flex; align-items: center; gap: 8px; color: $primary-color; text-decoration: none; font-weight: 600; font-size: 15px; }
+}
+
+.banner {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 60px 20px;
+  text-align: center;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba($primary-color, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(59,130,246,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .bannerBg { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+
+  .bannerLabel {
+    display: inline-block;
+    color: $primary-color;
+    font-size: 13px; font-weight: 800; letter-spacing: 4px;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  .bannerTitle {
+    color: #fff; font-size: 34px; font-weight: 800; line-height: 1.25;
+    margin: 0 0 18px;
+  }
+
+  .bannerMeta {
+    display: flex; justify-content: center; gap: 20px;
+    color: rgba(255,255,255,0.6); font-size: 13px;
+    span { display: flex; align-items: center; gap: 6px; }
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.main {
+  min-width: 0;
+
+  .featuredImage {
+    margin: 0 0 32px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    img { width: 100%; height: 380px; object-fit: cover; display: block; }
+  }
+}
+
+.article {
+  .h2 { font-size: 24px; font-weight: 800; color: #0f172a; margin: 36px 0 16px; line-height: 1.3; }
+  .p { font-size: 15px; line-height: 1.8; color: #334155; margin: 0 0 18px; }
+
+  .blockquote {
+    margin: 28px 0;
+    padding: 20px 28px;
+    background: #f1f5f9;
+    border-left: 4px solid $primary-color;
+    border-radius: 0 12px 12px 0;
+    font-size: 15px; line-height: 1.7;
+    color: #1e293b; font-style: italic;
+    position: relative;
+
+    &::before {
+      content: '"';
+      font-size: 48px;
+      color: $primary-color;
+      position: absolute;
+      top: 4px; left: 16px;
+      opacity: 0.2;
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+  }
+}
+
+.tags {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 36px; padding-top: 24px; border-top: 1px solid #e2e8f0;
+
+  .tagIcon { color: #94a3b8; margin-right: 4px; }
+  .tag { background: #f1f5f9; color: #475569; padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+}
+
+.share {
+  display: flex; align-items: center; gap: 12px; margin-top: 20px;
+
+  .shareLabel { font-size: 13px; font-weight: 600; color: #64748b; }
+
+  .shareLink {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #f1f5f9; color: #475569; font-size: 15px;
+    transition: all 0.25s ease;
+
+    &:hover { background: $primary-color; color: #fff; transform: translateY(-2px); }
+  }
+}
+
+.postNav {
+  display: flex; justify-content: space-between; gap: 16px;
+  margin-top: 40px; padding-top: 28px; border-top: 1px solid #e2e8f0;
+
+  .postNavLink {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: #0f172a;
+    font-size: 13px; font-weight: 600; max-width: 45%;
+    transition: color 0.25s ease;
+
+    span { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    &:hover { color: $primary-color; }
+  }
+
+  .postNavRight { text-align: right; }
+}
+
+.comments {
+  margin-top: 48px; padding-top: 32px; border-top: 1px solid #e2e8f0;
+
+  .commentsTitle { font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 24px; }
+
+  .comment {
+    display: flex; gap: 14px; margin-bottom: 20px;
+    padding: 18px; background: #fff; border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+
+    .commentAvatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, $primary-color, #e04040);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+
+    .commentBody {
+      flex: 1;
+      strong { font-size: 14px; color: #0f172a; display: block; }
+      .commentDate { font-size: 11px; color: #94a3b8; }
+      p { font-size: 13px; color: #475569; line-height: 1.6; margin: 6px 0 0; }
+    }
+  }
+
+  .commentForm {
+    margin-top: 28px; padding: 24px; background: #fff; border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+
+    .commentFormTitle { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px; }
+
+    .commentInput, .commentTextarea {
+      width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-size: 14px; font-family: $font-primary;
+      outline: none; transition: all 0.25s ease; margin-bottom: 12px; box-sizing: border-box;
+
+      &:focus { border-color: $primary-color; box-shadow: 0 0 0 4px rgba($primary-color, 0.08); }
+    }
+
+    .commentTextarea { resize: vertical; min-height: 90px; }
+
+    .commentSubmit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; background: $primary-color; color: #fff;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+      font-family: $font-primary; cursor: pointer; transition: all 0.3s ease;
+
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba($primary-color, 0.35); }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr; }
+  .banner .bannerTitle { font-size: 28px; }
+}
+
+@media (max-width: 768px) {
+  .banner {
+    padding: 40px 16px;
+    .bannerTitle { font-size: 22px; }
+    .bannerMeta { flex-wrap: wrap; gap: 10px; font-size: 12px; }
+  }
+
+  .layout { padding: 24px 16px 60px; }
+  .featuredImage img { height: 240px !important; }
+  .article .h2 { font-size: 20px; }
+  .postNav { flex-direction: column; .postNavLink { max-width: none; } }
+}

@@ -1,0 +1,347 @@
+@use "../../styles/abstracts/variables" as *;
+
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: $font-primary;
+}
+
+.loading {
+  padding: 100px;
+  text-align: center;
+  font-family: $font-primary;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 30px;
+
+  a { color: #888; text-decoration: none; }
+  span:last-child { color: #111; }
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.imageSection .imageBox {
+  height: 400px;
+  background: #f3f4f6;
+  border-radius: 16px;
+  position: relative;
+}
+
+.badgeOffer {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #ef4444;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badgeNew {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #10b981;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.category {
+  font-size: 12px;
+  color: $primary-color;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.name {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 14px;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  span { font-size: 13px; color: #888; }
+}
+
+.starFilled { color: #f59e0b; font-size: 14px; }
+.starEmpty { color: #e5e7eb; font-size: 14px; }
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+
+  .price { font-size: 32px; font-weight: 800; color: #111; }
+  .oldPrice { font-size: 18px; color: #aaa; text-decoration: line-through; }
+}
+
+.description {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 16px 0 24px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.qtySelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 10px;
+
+  button { background: none; border: none; cursor: pointer; padding: 6px; }
+  span { font-weight: 600; min-width: 24px; text-align: center; }
+}
+
+.addBtn {
+  flex: 1;
+  padding: 14px 24px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: $font-primary;
+  transition: all 0.3s;
+
+  &:hover { background: $primary-color; }
+}
+
+.whatsappBtn {
+  display: block;
+  padding: 12px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: $font-primary;
+}
+
+.tabsCard {
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 24px;
+}
+
+.tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: 600;
+  color: #888;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tabActive {
+  color: $primary-color;
+  border-bottom-color: $primary-color;
+}
+
+.tabContent {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.specsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.specItem {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  align-items: center;
+
+  svg { color: #10b981; flex-shrink: 0; }
+}
+
+.specLabel { font-size: 12px; color: #888; }
+.specValue { font-weight: 600; font-size: 14px; }
+
+.reviewForm {
+  margin-bottom: 28px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+
+  h3 { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: $font-primary;
+    outline: none;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+  }
+
+  textarea { resize: vertical; }
+}
+
+.starPicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+
+  span { font-size: 13px; color: #666; }
+}
+
+.starActive { background: none; border: none; cursor: pointer; padding: 2px; font-size: 18px; color: #f59e0b; }
+.starInactive { background: none; border: none; cursor: pointer; padding: 2px; font-size: 18px; color: #e5e7eb; }
+
+.submitBtn {
+  align-self: flex-start;
+  padding: 10px 24px;
+  background: $primary-color;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-primary;
+
+  &:disabled { background: #aaa; cursor: not-allowed; }
+}
+
+.noReviews {
+  color: #888;
+  font-size: 14px;
+}
+
+.review {
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  p { font-size: 13px; color: #666; margin: 0; }
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+
+  strong { font-size: 14px; }
+}
+
+.reviewStars { display: flex; gap: 2px; }
+
+.related {
+  margin-top: 40px;
+
+  h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.relatedCard {
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+
+  &:hover { transform: translateY(-4px); }
+}
+
+.relatedImage {
+  height: 140px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.relatedTitle { font-size: 13px; font-weight: 600; }
+.relatedName { font-size: 12px; color: #888; }
+.relatedPrice { font-weight: 700; font-size: 16px; margin-top: 8px; }

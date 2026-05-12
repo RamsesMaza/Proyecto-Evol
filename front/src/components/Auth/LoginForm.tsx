@@ -46,8 +46,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
       }
 
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      onSuccess("Has iniciado sesión exitosamente. ¡Bienvenido a American Certification Service!", "¡Bienvenido!");
+      onSuccess("Has iniciado sesión exitosamente. ¡Bienvenido a American Certification Service!", "¡Bienvenido!", () => { window.location.href = '/panel'; });
     } catch (err) {
       setError('Error de red. Por favor intenta más tarde.');
     }
