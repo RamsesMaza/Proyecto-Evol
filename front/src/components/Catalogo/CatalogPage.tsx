@@ -4,6 +4,7 @@ import { FaSearch, FaShoppingCart, FaStar, FaStarHalfAlt, FaRegStar, FaTimes, Fa
 import styles from './catalog.module.scss';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
+import { SkeletonCatalog, useSkeleton } from '../ui/Skeleton';
 
 interface Product {
   id: number; title: string; name: string; description: string;
@@ -31,17 +32,6 @@ const renderStars = (rating: number) => {
 const formatPrice = (n: number) =>
   `S/ ${n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const SkeletonCard = () => (
-  <div className={`${styles.card} ${styles.skeleton}`}>
-    <div className={styles.skeletonImage} />
-    <div className={styles.skeletonBody}>
-      <div className={`${styles.skeletonLine} ${styles.short}`} />
-      <div className={styles.skeletonLine} />
-      <div className={`${styles.skeletonLine} ${styles.medium}`} />
-    </div>
-  </div>
-);
-
 const CatalogPage = () => {
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -56,6 +46,7 @@ const CatalogPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [minPrice, setMinPrice] = useState('');
+  const { show: showSkeleton } = useSkeleton(loading, { minDisplayMs: 500, delayMs: 200 });
   const [maxPrice, setMaxPrice] = useState('');
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [quickView, setQuickView] = useState<Product | null>(null);
@@ -189,8 +180,8 @@ const CatalogPage = () => {
             </div>
 
             <div className={styles.grid}>
-              {loading
-                ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+              {showSkeleton
+                ? <SkeletonCatalog count={6} />
                 : products.map((product) => (
                     <div key={product.id} className={styles.card}>
                       {product.isOffer && <span className={`${styles.badge} ${styles.offer}`}>-{Math.round((1 - product.price / (product.oldPrice || product.price)) * 100)}%</span>}

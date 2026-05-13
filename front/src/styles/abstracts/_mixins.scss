@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 @mixin flex-center {
   display: flex;
   justify-content: center;
@@ -18,4 +20,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+$breakpoints: (
+  'mobile': 576px,
+  'tablet': 768px,
+  'desktop': 1024px,
+  'wide': 1280px,
+);
+
+@mixin respond-to($bp) {
+  $width: map.get($breakpoints, $bp);
+  @if $width {
+    @media (max-width: $width) { @content; }
+  } @else {
+    @warn "Unknown breakpoint: #{$bp}.";
+  }
 }

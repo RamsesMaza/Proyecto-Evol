@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FaStar, FaStarHalfAlt, FaRegStar, FaShoppingCart, FaWhatsapp, FaCheck, FaMinus, FaPlus, FaPaperPlane } from 'react-icons/fa';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
+import { SkeletonProductDetail, useSkeleton } from '../ui/Skeleton';
 import styles from './ProductDetail.module.scss';
 
 interface Product {
@@ -41,6 +42,7 @@ const ProductDetail = () => {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const { show: showSkeleton } = useSkeleton(loading, { minDisplayMs: 600, delayMs: 200 });
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -85,7 +87,7 @@ const ProductDetail = () => {
     }
   };
 
-  if (loading) return <div className={styles.loading}>Cargando...</div>;
+  if (showSkeleton) return <SkeletonProductDetail />;
   if (!product) return <div className={styles.loading}>Producto no encontrado</div>;
 
   const discount = product.oldPrice ? Math.round((1 - product.price / product.oldPrice) * 100) : 0;

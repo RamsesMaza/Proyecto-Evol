@@ -1,0 +1,442 @@
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+
+// ─── Premium Keyframes ─────────────────────────────────────
+// Diagonal shimmer — used by Stripe, Linear, Vercel
+@keyframes shimmer-diagonal {
+  0% { background-position: -200% -200%; }
+  100% { background-position: 200% 200%; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.75; }
+}
+
+@keyframes wave {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  50.001% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideUpIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDownOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+// ─── CSS Custom Properties ────────────────────────────────
+.skeleton {
+  --skeleton-base: #e4e7ed;
+  --skeleton-highlight: #d1d5dc;
+  --skeleton-shimmer: linear-gradient(
+    135deg,
+    var(--skeleton-base) 30%,
+    var(--skeleton-highlight) 45%,
+    var(--skeleton-base) 60%
+  );
+  --skeleton-speed: 1.8s;
+  --skeleton-index: 0;
+
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  animation: fadeIn 0.25s ease-out both;
+  animation-delay: calc(var(--skeleton-index) * 0.05s);
+}
+
+// ─── Animation Variants ───────────────────────────────────
+.shimmer {
+  background: var(--skeleton-shimmer);
+  background-size: 300% 300%;
+  animation: shimmer-diagonal var(--skeleton-speed) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: pulse-soft 2.5s ease-in-out infinite;
+    background: var(--skeleton-base);
+  }
+}
+
+.pulse {
+  background: var(--skeleton-base);
+  animation: pulse-soft 2.5s ease-in-out infinite;
+}
+
+.wave {
+  background: var(--skeleton-base);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--skeleton-shimmer);
+    animation: wave var(--skeleton-speed) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+}
+
+// ─── Variant Shapes ───────────────────────────────────────
+.text {
+  border-radius: 4px;
+  height: 0.85em;
+  width: 100%;
+  transform-origin: left;
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.rect {
+  border-radius: 8px;
+}
+
+// ─── Composite Skeletons ──────────────────────────────────
+
+.skeletonCard {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 1px rgba(0, 0, 0, 0.03);
+  animation: fadeIn 0.3s ease-out both;
+  animation-delay: calc(var(--skeleton-index, 0) * 0.06s);
+  min-height: 280px;
+}
+
+.skeletonCardImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.skeletonCardBody {
+  padding: 18px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonTable {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonTableHeader {
+  padding: 14px 16px;
+  background: #f8f9fb;
+  display: flex;
+  gap: 16px;
+}
+
+.skeletonTableRow {
+  padding: 14px 16px;
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid #f0f1f4;
+
+  &:last-child { border-bottom: none; }
+}
+
+.skeletonForm {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.skeletonHero {
+  width: 100%;
+  min-height: 400px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 64px 24px;
+  animation: fadeIn 0.35s ease-out both;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #f9fafb 0%, #f0f1f5 50%, #f9fafb 100%);
+    background-size: 300% 300%;
+    animation: shimmer-diagonal 2.5s ease-in-out infinite;
+    opacity: 0.6;
+  }
+
+  > * { position: relative; }
+
+  @include respond-to('tablet') { min-height: 320px; padding: 44px 20px; }
+  @include respond-to('mobile') { min-height: 260px; padding: 32px 16px; gap: 16px; }
+}
+
+.skeletonSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonSidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.skeletonCatalog {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  animation: fadeIn 0.3s ease-out both;
+
+  @include respond-to('tablet') { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  @include respond-to('mobile') { grid-template-columns: 1fr; gap: 16px; }
+}
+
+.skeletonProductDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonProductMain {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+
+  @include respond-to('tablet') { gap: 36px; }
+  @include respond-to('mobile') { grid-template-columns: 1fr; gap: 28px; }
+}
+
+.skeletonImageCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonInfoCol {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.skeletonTabsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.skeletonRelated {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+
+  @include respond-to('tablet') { grid-template-columns: repeat(2, 1fr); }
+  @include respond-to('mobile') { grid-template-columns: 1fr; }
+}
+
+.skeletonBlogGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  animation: fadeIn 0.3s ease-out both;
+
+  @include respond-to('tablet') { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  @include respond-to('mobile') { grid-template-columns: 1fr; gap: 20px; }
+}
+
+.skeletonBlogPost {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 44px;
+  animation: fadeIn 0.3s ease-out both;
+
+  @include respond-to('tablet') { grid-template-columns: 1fr 240px; gap: 32px; }
+  @include respond-to('mobile') { grid-template-columns: 1fr; gap: 28px; }
+}
+
+.skeletonBlogContent {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.skeletonBlogSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeletonDashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonDashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  @include respond-to('tablet') { grid-template-columns: repeat(2, 1fr); }
+  @include respond-to('mobile') { grid-template-columns: 1fr; }
+}
+
+.skeletonDashboardChart {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+
+  @include respond-to('mobile') { grid-template-columns: 1fr; }
+}
+
+.skeletonTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonAvatar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.skeletonStatCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-out both;
+  animation-delay: calc(var(--skeleton-index, 0) * 0.07s);
+
+  @include respond-to('mobile') { padding: 18px 16px; }
+}
+
+// ─── PageSkeleton ──────────────────────────────────────────
+
+.pageSkeleton {
+  animation: slideUpIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.pageSkeletonInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  @include respond-to('tablet') { padding: 0 20px; }
+  @include respond-to('mobile') { padding: 0 16px; }
+}
+
+// ─── SkeletonWrapper ───────────────────────────────────────
+
+.wrapper {
+  position: relative;
+}
+
+.wrapperSkeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  animation: none;
+}
+
+.wrapperContent {
+  position: relative;
+  z-index: 2;
+  animation: slideUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wrapperContentStatic {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+}
+
+.wrapperContentVisible {
+  opacity: 1;
+  transition: opacity 0.35s ease-out;
+}
+
+// ─── Content transition ────────────────────────────────────
+
+.contentEnter {
+  animation: slideUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contentExit {
+  animation: fadeOut 0.15s ease-in both;
+}
+
+// ─── Dark mode ─────────────────────────────────────────────
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    --skeleton-base: #262932;
+    --skeleton-highlight: #323641;
+  }
+
+  .skeletonCard,
+  .skeletonTable,
+  .skeletonStatCard {
+    background: #1a1c24;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  }
+
+  .skeletonHero::before {
+    background: linear-gradient(135deg, #1e2028 0%, #262932 50%, #1e2028 100%);
+  }
+
+  .skeletonTableHeader {
+    background: #20222b;
+  }
+
+  .skeletonTableRow {
+    border-bottom-color: #262932;
+  }
+}

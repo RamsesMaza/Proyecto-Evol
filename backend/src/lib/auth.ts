@@ -17,9 +17,10 @@ export const generateToken = (payload: object) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 };
 
-export const verifyRecaptcha = async (token: string): Promise<boolean> => {
-  if (!RECAPTCHA_SECRET) {
-    console.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación de reCAPTCHA.');
+export const verifyRecaptcha = async (token?: string | null): Promise<boolean> => {
+  if (!token || !RECAPTCHA_SECRET) {
+    if (!token) console.warn('reCAPTCHA token no proporcionado. Saltando validación.');
+    if (!RECAPTCHA_SECRET) console.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación.');
     return true;
   }
 
