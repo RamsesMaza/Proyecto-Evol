@@ -498,24 +498,44 @@
 }
 
 .colorSwatch {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2.5px solid transparent;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
   padding: 0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  position: relative;
 
   &:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
+}
+
+.swatchCheck {
+  font-size: 12px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
 }
 
 .colorActive {
   border-color: #0f172a;
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
-  transform: scale(1.1);
+  transform: scale(1.15);
+}
+
+.colorLabel {
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Preview */
@@ -528,12 +548,28 @@
 .previewTag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 8px;
   width: fit-content;
+}
+
+.previewBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.previewText {
+  color: #0f172a;
+  font-weight: 600;
 }
 
 /* ═══════════════ EVENT PANEL ═══════════════ */

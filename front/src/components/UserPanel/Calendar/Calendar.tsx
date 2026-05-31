@@ -69,10 +69,6 @@ const Calendar = () => {
     else setEditing(null);
   }, [events]);
 
-  const handleAdd = useCallback(() => {
-    setEditing({ id: '', title: '', date: selectedDate, type: 'event' });
-  }, [selectedDate]);
-
   const handleEdit = useCallback((e: CalendarEvent) => setEditing(e), []);
 
   const handleSave = useCallback((ev: CalendarEvent) => {
@@ -92,8 +88,6 @@ const Calendar = () => {
   const handlePlus = useCallback(() => {
     setEditing({ id: '', title: '', date: selectedDate, type: 'event' });
   }, [selectedDate]);
-
-  const eventsForDate = (dateStr: string) => events.filter(e => e.date === dateStr);
 
   return (
     <div className={styles.wrapper}>

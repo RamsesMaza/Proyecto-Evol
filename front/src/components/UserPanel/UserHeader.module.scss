@@ -210,13 +210,414 @@
   margin: 6px 8px;
 }
 
+/* ─── Dropdown Panel (Notifications / Messages) ─── */
+.dropdownWrap {
+  position: relative;
+}
+
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -8px;
+  width: 360px;
+  max-height: 480px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  animation: dropIn 0.15s ease;
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.panelClear {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: all 0.12s;
+
+  &:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  svg { font-size: 10px; }
+}
+
+.panelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+}
+
+.panelItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+
+  &:hover { background: #f8fafc; }
+}
+
+.panelItemUnread {
+  background: #fef2f2;
+
+  &:hover { background: #fee2e2; }
+}
+
+.panelItemIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.panelItemContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.panelItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.panelItemDesc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.panelItemTime {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.panelDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $primary-color;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.panelEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+
+  p {
+    font-size: 13px;
+    margin: 8px 0 0;
+    font-weight: 500;
+  }
+}
+
+.panelEmptyIcon {
+  font-size: 32px;
+  opacity: 0.3;
+}
+
+.panelFooter {
+  padding: 10px 18px;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.panelFooterBtn {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: $primary-color;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: all 0.12s;
+
+  &:hover {
+    background: rgba($primary-color, 0.08);
+  }
+}
+
+/* ─── Message Avatar ─── */
+.msgAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ─── Settings Dropdown ─── */
+.settingsDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+  z-index: 200;
+  animation: dropIn 0.15s ease;
+}
+
+.settingsHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 4px;
+
+  svg { font-size: 15px; color: $primary-color; }
+}
+
+.settingsItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: $font-primary;
+  color: #475569;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.12s;
+  text-align: left;
+
+  svg { font-size: 15px; color: #94a3b8; }
+
+  &:hover {
+    background: #f1f5f9;
+    color: $primary-color;
+
+    svg { color: $primary-color; }
+  }
+}
+
+/* ─── Profile Dropdown User Info ─── */
+.dropdownUser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+}
+
+.dropdownAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $primary-color, #e04040);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dropdownName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.dropdownEmail {
+  font-size: 11px;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Search Dropdown ─── */
+.searchWrap {
+  position: relative;
+  flex: 1;
+  max-width: 420px;
+}
+
+.searchDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 200;
+  padding: 6px;
+  animation: dropIn 0.12s ease;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.searchItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: $font-primary;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.searchItemIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba($primary-color, 0.1), rgba($primary-color, 0.05));
+  color: $primary-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.searchItemContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.searchItemLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.searchItemDesc {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  color: #94a3b8;
+
+  p {
+    font-size: 13px;
+    margin: 8px 0 0;
+    font-weight: 500;
+
+    strong { color: #64748b; }
+  }
+}
+
+.searchEmptyIcon {
+  font-size: 24px;
+  opacity: 0.3;
+}
+
+/* ─── Responsive ─── */
 @media (max-width: 768px) {
   .header {
     padding: 0 16px;
   }
 
-  .searchBar {
+  .searchWrap {
     max-width: 200px;
+  }
+
+  .searchBar {
+    max-width: 100%;
   }
 
   .userInfo {
@@ -225,5 +626,21 @@
 
   .userBtn {
     padding: 6px;
+  }
+
+  .dropdownPanel {
+    width: 300px;
+    right: -40px;
+  }
+
+  .settingsDropdown {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dropdownPanel {
+    width: calc(100vw - 32px);
+    right: -16px;
   }
 }

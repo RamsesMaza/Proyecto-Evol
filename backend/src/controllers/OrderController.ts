@@ -3,6 +3,16 @@ import { z } from 'zod';
 import { OrderModel } from '../models/OrderModel';
 import { validate } from '../middleware/validate';
 
+export const listOrdersSchema = z.object({
+  query: z.string().optional(),
+  status: z.string().optional(),
+  paymentStatus: z.string().optional(),
+  page: z.coerce.number().optional(),
+  pageSize: z.coerce.number().optional(),
+  sortField: z.string().optional(),
+  sortDir: z.enum(['asc', 'desc']).optional(),
+});
+
 export const createOrderSchema = z.object({
   items: z.array(z.object({
     productId: z.number(),
@@ -34,6 +44,26 @@ export const createOrderSchema = z.object({
 export const OrderController = {
   validate: {
     create: validate(createOrderSchema),
+    list: validate(listOrdersSchema, 'query'),
+  },
+
+  list: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { page, pageSize, ...rest } = req.query;
+      const result = await OrderModel.list({
+        ...rest,
+        page: Number(page) || 0,
+        pageSize: Number(pageSize) || 100,
+      } as any);
+      res.json(result);
+    } catch (err) { next(err); }
+  },
+
+  stats: async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await OrderModel.getStats();
+      res.json(result);
+    } catch (err) { next(err); }
   },
 
   create: async (req: Request, res: Response, next: NextFunction) => {

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FaHome, FaCertificate, FaBook, FaCalendarAlt, FaEnvelope, FaSignOutAlt, FaChevronLeft, FaTimes, FaBars } from 'react-icons/fa';
+import { FaHome, FaCertificate, FaBook, FaCalendarAlt, FaEnvelope, FaSignOutAlt, FaChevronLeft, FaTimes, FaBars, FaShieldAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Sidebar.module.scss';
 
@@ -9,6 +9,7 @@ const menuItems = [
   { key: 'certificados', label: 'Certificados', icon: <FaCertificate /> },
   { key: 'calendario', label: 'Calendario', icon: <FaCalendarAlt /> },
   { key: 'mensajes', label: 'Mensajes', icon: <FaEnvelope /> },
+  { key: 'seguridad', label: 'Seguridad', icon: <FaShieldAlt /> },
 ] as const;
 
 interface SidebarProps {

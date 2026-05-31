@@ -1,0 +1,168 @@
+@use '../../styles/abstracts/variables' as *;
+@use 'sass:color';
+
+.module { width: 100%; }
+
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; flex-wrap: wrap; }
+
+.headerLeft { display: flex; align-items: center; gap: 14px; }
+
+.headerIcon { width: 44px; height: 44px; border-radius: 12px; background: rgba(#2563eb, 0.08); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+.title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.3px; }
+
+.subtitle { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; font-weight: 500; }
+
+.headerActions { display: flex; align-items: center; gap: 10px; }
+
+.refresh { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 15px; transition: all 0.2s;
+  &:hover { border-color: var(--text-muted); background: color-mix(in srgb, var(--bg-primary) 50%, var(--bg-card) 50%); }
+}
+
+.btnPrimary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; border: none; background: $primary-color; color: #fff; font-size: 13px; font-weight: 600; font-family: $font-primary; cursor: pointer; transition: all 0.2s;
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(193, 14, 26, 0.3); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  svg { font-size: 14px; }
+}
+
+.btnOutline { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 600; font-family: $font-primary; cursor: pointer; transition: all 0.2s;
+  &:hover { border-color: var(--text-muted); transform: translateY(-1px); }
+}
+
+.btnDanger { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; border: none; background: #dc2626; color: #fff; font-size: 13px; font-weight: 600; font-family: $font-primary; cursor: pointer; transition: all 0.2s;
+  &:hover { background: #b91c1c; transform: translateY(-1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+}
+
+.toast { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; background: #f0fdf4; color: #166534; font-size: 13px; font-weight: 500; margin-bottom: 16px; animation: slideIn 0.2s ease;
+  svg { color: #22c55e; }
+}
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+.filterBar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+
+.searchWrap { position: relative; flex: 1; min-width: 200px; }
+
+.searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; pointer-events: none; }
+
+.searchInput { width: 100%; padding: 10px 36px 10px 36px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: $font-primary; outline: none; transition: border-color 0.15s; box-sizing: border-box;
+  &:focus { border-color: $primary-color; }
+  &::placeholder { color: var(--text-muted); }
+}
+
+.clearBtn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 2px;
+  &:hover { color: var(--text-primary); }
+}
+
+.filterSelect { padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: $font-primary; outline: none; cursor: pointer; transition: border-color 0.15s; min-width: 140px;
+  &:focus { border-color: $primary-color; }
+}
+
+.tableCard { background: var(--bg-card); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); overflow-x: auto; }
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 60px 20px; gap: 10px; color: var(--text-secondary); font-size: 14px; }
+
+.spinner { animation: spin 0.8s linear infinite; font-size: 20px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.table { width: 100%; border-collapse: collapse;
+  th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-light); background: color-mix(in srgb, var(--bg-primary) 30%, var(--bg-card) 70%); white-space: nowrap; }
+  td { padding: 12px 16px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border-light); }
+}
+
+.tr { transition: background 0.1s;
+  &:hover { background: color-mix(in srgb, var(--bg-primary) 40%, var(--bg-card) 60%); }
+}
+
+.thCenter, .tdCenter { text-align: center !important; }
+.thActions { width: 220px; }
+
+.cellName { font-weight: 600; white-space: nowrap; }
+.cellEmail { color: var(--text-secondary); font-size: 12px; }
+.cellDate { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+
+.roleBadge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+
+.statusBadge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
+
+.tdActions { white-space: nowrap; }
+
+.actionBtns { display: flex; align-items: center; gap: 4px; }
+
+.actionBtn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-medium); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s;
+  &:hover { border-color: var(--text-muted); color: var(--text-primary); background: color-mix(in srgb, var(--bg-primary) 50%, var(--bg-card) 50%); }
+}
+
+.quickAction { padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border-medium); background: var(--bg-card); color: var(--text-secondary); font-size: 11px; font-family: $font-primary; cursor: pointer; outline: none;
+  &:focus { border-color: $primary-color; }
+}
+
+.emptyCell { text-align: center; padding: 40px 16px !important; color: var(--text-muted); font-size: 14px; }
+
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-top: 1px solid var(--border-light); flex-wrap: wrap; gap: 12px; }
+
+.pageInfo { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+.pageBtns { display: flex; align-items: center; gap: 4px; }
+
+.pageBtn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-medium); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; transition: all 0.15s;
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:hover:not(:disabled) { border-color: $primary-color; color: $primary-color; }
+  &.pageBtnActive { background: $primary-color; border-color: $primary-color; color: #fff; }
+}
+
+/* ─── Modals ─── */
+
+.modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+
+.modal { background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 540px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.2s ease; }
+
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+.modalHeader { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border-light);
+  h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;
+    svg { color: $primary-color; font-size: 18px; }
+  }
+  button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; padding: 4px; line-height: 1;
+    &:hover { color: var(--text-primary); }
+  }
+}
+
+.modalBody { padding: 24px; }
+
+.modalFooter { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border-light); }
+
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 6px;
+  &.fieldFull { grid-column: 1 / -1; }
+  label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; }
+  input, select { padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: $font-primary; outline: none; transition: border-color 0.15s; width: 100%; box-sizing: border-box;
+    &:focus { border-color: $primary-color; }
+  }
+}
+
+.detailGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.detailField { display: flex; flex-direction: column; gap: 4px;
+  span { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+  strong { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+}
+
+.activityList { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+
+.activityItem { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--bg-primary) 40%, var(--bg-card) 60%);
+  strong { font-size: 12px; font-weight: 600; display: block; }
+}
+
+.activityDot { width: 8px; height: 8px; border-radius: 50%; background: #8b5cf6; margin-top: 5px; flex-shrink: 0; }
+
+.emptyText { text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px 0; }
+
+@media (max-width: 768px) {
+  .formGrid { grid-template-columns: 1fr; }
+  .detailGrid { grid-template-columns: 1fr; }
+  .headerActions { width: 100%; }
+  .btnPrimary { flex: 1; justify-content: center; }
+}

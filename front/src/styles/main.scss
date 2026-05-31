@@ -8,6 +8,23 @@
 :root {
   --primary-color: #C10E1A;
   --black: #000000;
+  --bg-primary: #f0f2f5;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-light: #f1f5f9;
+  --border-medium: #e2e8f0;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0b1120;
+  --bg-card: #1a2332;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-light: #1e293b;
+  --border-medium: #334155;
 }
 
 .container-center {

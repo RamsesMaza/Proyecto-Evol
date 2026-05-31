@@ -29,7 +29,12 @@ export const ProductController = {
 
   list: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await ProductModel.list(req.query as any);
+      const { page, limit, ...rest } = req.query;
+      const result = await ProductModel.list({
+        ...rest,
+        page: Number(page) || 1,
+        limit: Number(limit) || 12,
+      } as any);
       res.json(result);
     } catch (err) { next(err); }
   },

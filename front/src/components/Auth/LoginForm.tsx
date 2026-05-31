@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useAuth } from '../../context/AuthContext';
+import TwoFactorForm from './TwoFactorForm';
 import styles from './Auth.module.scss';
 import { validateEmail } from '../../utils/validators';
 import { FcGoogle } from 'react-icons/fc';
@@ -11,10 +13,13 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
+  const { setTwoFactorChallenge, clearTwoFactorChallenge } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [error, setError] = useState('');
+  const [show2FA, setShow2FA] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +50,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
         return;
       }
 
+      if (data.requires2FA) {
+        setTwoFactorChallenge(data.partialToken, data.method);
+        setPendingEmail(email);
+        setShow2FA(true);
+        return;
+      }
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -53,6 +65,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
       setError('Error de red. Por favor intenta más tarde.');
     }
   };
+
+  if (show2FA) {
+    return <TwoFactorForm email={pendingEmail} onCancel={() => { setShow2FA(false); clearTwoFactorChallenge(); }} />;
+  }
 
   return (
     <div className={styles.authFormContainer}>

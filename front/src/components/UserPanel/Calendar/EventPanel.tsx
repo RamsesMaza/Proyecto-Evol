@@ -4,6 +4,25 @@ import DatePicker from 'react-datepicker';
 import type { CalendarEvent } from './Calendar';
 import styles from './Calendar.module.scss';
 
+function getContrastColor(hex: string): string {
+  const c = hex.replace('#', '');
+  if (c.length < 6) return '#0f172a';
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.55 ? '#0f172a' : '#ffffff';
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const c = hex.replace('#', '');
+  if (c.length < 6) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 interface Props {
   editing: CalendarEvent | null;
   events: CalendarEvent[];
@@ -24,7 +43,7 @@ const COLORS = [
   { key: 'teal', value: '#14b8a6', label: 'Teal' },
 ];
 
-const EventPanel = ({ editing, selectedDate, onSave, onDelete }: Props) => {
+const EventPanel = ({ editing, selectedDate, onSave, onDelete, onClose }: Props) => {
   const [title, setTitle] = useState('');
   const [type, setType] = useState<'reminder' | 'event'>('event');
   const [date, setDate] = useState<Date>(new Date());
@@ -146,12 +165,15 @@ const EventPanel = ({ editing, selectedDate, onSave, onDelete }: Props) => {
           {COLORS.map(c => (
             <button key={c.key}
               className={`${styles.colorSwatch} ${color === c.value ? styles.colorActive : ''}`}
-              style={{ background: c.value }}
+              style={{ background: c.value, color: getContrastColor(c.value) }}
               onClick={() => setColor(c.value)}
               title={c.label}
-            />
+            >
+              {color === c.value && <span className={styles.swatchCheck}>✓</span>}
+            </button>
           ))}
         </div>
+        {color && <span className={styles.colorLabel} style={{ color }}>● {COLORS.find(c => c.value === color)?.label || 'Personalizado'}</span>}
       </div>
 
       {/* Location */}
@@ -177,9 +199,12 @@ const EventPanel = ({ editing, selectedDate, onSave, onDelete }: Props) => {
       {title.trim() && (
         <div className={styles.previewRow}>
           <span className={styles.fieldLabel}>Vista previa</span>
-          <span className={styles.previewTag} style={{ background: `${color}18`, color }}>
-            {type === 'reminder' ? <FaBell className={styles.tagIcon} /> : <FaCalendarAlt className={styles.tagIcon} />} {title}
-          </span>
+          <div className={styles.previewTag} style={{ background: hexToRgba(color, 0.12), color, borderLeft: `3px solid ${color}` }}>
+            <span className={styles.previewBadge} style={{ background: color, color: getContrastColor(color) }}>
+              {type === 'reminder' ? <FaBell /> : <FaCalendarAlt />}
+            </span>
+            <span className={styles.previewText}>{title}</span>
+          </div>
         </div>
       )}
 

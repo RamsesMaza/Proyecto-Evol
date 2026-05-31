@@ -4,6 +4,15 @@ import type { CalendarEvent } from './Calendar';
 import { formatDate } from './Calendar';
 import styles from './Calendar.module.scss';
 
+function hexToRgba(hex: string, alpha: number): string {
+  const c = hex.replace('#', '');
+  if (c.length < 6) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 interface Props {
   view: 'month' | 'week' | 'day';
   year: number;
@@ -49,14 +58,17 @@ const MonthView = ({ year, month, daysInMonth, firstDOW, todayStr, selectedDate,
             <span className={styles.dayNum}>{cell.day}</span>
             {dayEvents.length > 0 && (
               <div className={styles.eventDots}>
-                {dayEvents.slice(0, 2).map((ev: CalendarEvent) => (
-                  <span key={ev.id}
-                    className={styles.eventTag}
-                    style={{ background: `${ev.color || (ev.type === 'reminder' ? 'rgba(239,68,68,0.08)' : 'rgba(59,130,246,0.08)')}`, color: ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb') }}
-                    onClick={e => { e.stopPropagation(); onEventClick(ev); }} title={ev.title}>
-                    {ev.type === 'reminder' ? <FaBell className={styles.tagIcon} /> : <FaCalendarAlt className={styles.tagIcon} />} {ev.title}
-                  </span>
-                ))}
+                {dayEvents.slice(0, 2).map((ev: CalendarEvent) => {
+                  const ec = ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb');
+                  return (
+                    <span key={ev.id}
+                      className={styles.eventTag}
+                      style={{ background: hexToRgba(ec, 0.12), color: ec, borderLeft: `2px solid ${ec}` }}
+                      onClick={e => { e.stopPropagation(); onEventClick(ev); }} title={ev.title}>
+                      {ev.title}
+                    </span>
+                  );
+                })}
                 {dayEvents.length > 2 && <span className={styles.moreTag}>+{dayEvents.length - 2} más</span>}
               </div>
             )}
@@ -96,14 +108,17 @@ const WeekView = ({ selectedDate, todayStr, events, onDaySelect, onEventClick }:
             </div>
             <div className={styles.weekEvents}>
               {dayEvents.length === 0 && <span className={styles.weekEmpty}>Sin eventos</span>}
-              {dayEvents.map((ev: CalendarEvent) => (
-                <div key={ev.id} className={styles.weekEvent}
-                  style={{ borderLeftColor: ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb') }}
-                  onClick={e => { e.stopPropagation(); onEventClick(ev); }}>
-                  <span className={styles.weekEventTime}>{ev.from || 'Todo el día'}</span>
-                  <span className={styles.weekEventTitle}>{ev.title}</span>
-                </div>
-              ))}
+              {dayEvents.map((ev: CalendarEvent) => {
+                const ec = ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb');
+                return (
+                  <div key={ev.id} className={styles.weekEvent}
+                    style={{ borderLeftColor: ec, background: hexToRgba(ec, 0.06) }}
+                    onClick={e => { e.stopPropagation(); onEventClick(ev); }}>
+                    <span className={styles.weekEventTime} style={{ color: ec }}>{ev.from || 'Todo el día'}</span>
+                    <span className={styles.weekEventTitle}>{ev.title}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -147,7 +162,7 @@ const DayView = ({ selectedDate, events, onEventClick }: any) => {
             <div className={styles.dayEventBody}>
               <span className={styles.dayEventTitle}>{ev.title}</span>
               {ev.location && <span className={styles.dayEventLoc}>{ev.location}</span>}
-              <span className={`${styles.dayEventType} ${ev.type === 'reminder' ? styles.tagReminder : styles.tagEvent}`}>
+              <span className={styles.dayEventType} style={{ background: hexToRgba(ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb'), 0.1), color: ev.color || (ev.type === 'reminder' ? '#dc2626' : '#2563eb') }}>
                 {ev.type === 'reminder' ? <FaBell className={styles.tagIcon} /> : <FaCalendarAlt className={styles.tagIcon} />} {ev.type === 'reminder' ? 'Recordatorio' : 'Evento'}
               </span>
             </div>

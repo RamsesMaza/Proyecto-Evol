@@ -15,6 +15,7 @@ import Calendar from './Calendar/Calendar';
 import Certificates from './Certificates/Certificates';
 import Courses from './Courses/Courses';
 import Messages from './Messages/Messages';
+import SecuritySettings from './SecuritySettings';
 import styles from './UserPanel.module.scss';
 
 interface ProfileData {
@@ -227,7 +228,7 @@ const UserPanel = () => {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
 
       <div className={`${styles.mainArea} ${sidebarCollapsed ? styles.mainExpanded : ''}`}>
-        <UserHeader />
+        <UserHeader onNavigate={setActiveSection} />
         <button className={styles.mobileToggle} onClick={() => setMobileOpen(true)} aria-label="Abrir menú">
           <span /><span /><span />
         </button>
@@ -418,6 +419,7 @@ const UserPanel = () => {
           {activeSection === 'cursos' && <Courses />}
 
           {activeSection === 'mensajes' && <Messages />}
+          {activeSection === 'seguridad' && <SecuritySettings />}
         </div>
       </div>
 

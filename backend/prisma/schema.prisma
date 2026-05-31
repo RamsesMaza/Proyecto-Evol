@@ -11,33 +11,51 @@ enum Role {
   ADMIN
   USER
   SALES
+  TI
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String?
-  company   String?
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phone             String?
+  company           String?
+  password          String
+  role              Role     @default(USER)
+  status            String   @default("nuevo")
+  isFavorite        Boolean  @default(false)
+  twoFactorEnabled  Boolean  @default(false)
+  twoFactorMethod   String?  @default("email")
+  twoFactorSecret   String?
+  phoneVerified     Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  ticketsCreated  SupportTicket[] @relation("TicketCreator")
+  ticketsAssigned SupportTicket[] @relation("TicketAssignee")
+  sessions        UserSession[]
+
+  @@index([status])
+  @@index([role])
 }
 
 model OtpCode {
-  id         Int       @id @default(autoincrement())
-  email      String
-  code       String
-  attempts   Int       @default(0)
-  maxAttempts Int      @default(5)
-  expiresAt  DateTime
-  usedAt     DateTime?
-  createdAt  DateTime  @default(now())
+  id          Int       @id @default(autoincrement())
+  email       String?
+  phone       String?
+  userId      Int?
+  code        String
+  purpose     String    @default("password_reset")
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
 
-  @@index([email, code])
-  @@index([email])
+  @@index([email, purpose])
+  @@index([phone, purpose])
+  @@index([userId, purpose])
 }
 
 model Category {
@@ -158,4 +176,159 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+enum CotizacionEstado {
+  pendiente
+  aprobada
+  rechazada
+  expirada
+  revision
+}
+
+model Cotizacion {
+  id             Int                 @id @default(autoincrement())
+  codigo         String              @unique
+  clienteId      Int?
+  clienteNombre  String
+  clienteEmail   String
+  clientePhone   String?
+  clienteCompany String?
+  vendedorId     Int?
+  vendedorNombre String?
+  fecha          DateTime            @default(now())
+  vencimiento    DateTime
+  estado         CotizacionEstado    @default(pendiente)
+  subtotal       Float               @default(0)
+  descuento      Float               @default(0)
+  impuesto       Float               @default(0)
+  total          Float               @default(0)
+  notas          String?             @db.Text
+  terminos       String?             @db.Text
+  metodoPago     String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  items          CotizacionItem[]
+  actividad      CotizacionActividad[]
+
+  @@index([codigo])
+  @@index([clienteId])
+  @@index([estado])
+  @@index([fecha])
+}
+
+model CotizacionItem {
+  id           Int         @id @default(autoincrement())
+  cotizacionId Int
+  cotizacion   Cotizacion  @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
+  producto     String
+  descripcion  String?
+  cantidad     Int         @default(1)
+  precioUnit   Float       @default(0)
+  descuento    Float       @default(0)
+  total        Float       @default(0)
+
+  @@index([cotizacionId])
+}
+
+model CotizacionActividad {
+  id           Int         @id @default(autoincrement())
+  cotizacionId Int
+  cotizacion   Cotizacion  @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
+  tipo         String
+  descripcion  String
+  usuario      String?
+  fecha        DateTime    @default(now())
+
+  @@index([cotizacionId])
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  module      String
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  id           Int      @id @default(autoincrement())
+  role         String
+  permissionId Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@unique([role, permissionId])
+  @@index([role])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  userEmail   String?
+  userName    String?
+  action      String
+  entity      String
+  entityId    String?
+  description String?
+  ipAddress   String?
+  oldValues   String?  @db.Text
+  newValues   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SupportTicket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  status      String   @default("abierto")
+  priority    String   @default("media")
+  createdById Int?
+  createdBy   User?    @relation("TicketCreator", fields: [createdById], references: [id])
+  assignedToId Int?
+  assignedTo  User?    @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  resolution  String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdById])
+  @@index([assignedToId])
+}
+
+model LoginAttempt {
+  id        Int      @id @default(autoincrement())
+  email     String
+  userId    Int?
+  ipAddress String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model UserSession {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  token        String
+  ipAddress    String?
+  userAgent    String?
+  isActive     Boolean  @default(true)
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([isActive])
 }

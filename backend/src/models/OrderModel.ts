@@ -98,4 +98,78 @@ export const OrderModel = {
     await sendInvoiceEmail(email, pdfBuffer, orderId);
     return { message: 'Recibo enviado correctamente' };
   },
+
+  async list(filters: {
+    query?: string; status?: string; paymentStatus?: string;
+    page?: number; pageSize?: number; sortField?: string; sortDir?: 'asc' | 'desc';
+  }) {
+    const { query, status, paymentStatus, page = 0, pageSize = 100, sortField = 'createdAt', sortDir = 'desc' } = filters;
+    const where: any = {};
+    if (status) where.status = status;
+    if (paymentStatus) where.paymentStatus = paymentStatus;
+    if (query) {
+      where.OR = [
+        { customerName: { contains: query } },
+        { customerEmail: { contains: query } },
+      ];
+    }
+    const orderBy: any = {};
+    orderBy[sortField] = sortDir;
+    const [total, orders] = await Promise.all([
+      prisma.order.count({ where }),
+      prisma.order.findMany({
+        where, orderBy, skip: page * pageSize, take: pageSize,
+        include: { items: { include: { product: true } } },
+      }),
+    ]);
+    return { orders: orders.map(formatOrder), total };
+  },
+
+  async getStats() {
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const [total, paid, pending, cancelled, thisMonth, revenue] = await Promise.all([
+      prisma.order.count(),
+      prisma.order.count({ where: { paymentStatus: 'paid' } }),
+      prisma.order.count({ where: { paymentStatus: 'pending' } }),
+      prisma.order.count({ where: { paymentStatus: { in: ['cancelled', 'refunded'] } } }),
+      prisma.order.count({ where: { createdAt: { gte: firstOfMonth }, paymentStatus: 'paid' } }),
+      prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: 'paid' } }),
+    ]);
+    return { total, paid, pending, cancelled, ingresos: revenue._sum.total || 0, esteMes: thisMonth };
+  },
 };
+
+function formatOrder(o: any) {
+  return {
+    id: String(o.id),
+    codigo: `ORD-${String(o.id).padStart(4, '0')}`,
+    clienteNombre: o.customerName,
+    clienteEmail: o.customerEmail,
+    clientePhone: o.customerPhone,
+    clienteCompany: null,
+    vendedorNombre: null,
+    fecha: o.createdAt ? (typeof o.createdAt === 'string' ? o.createdAt.split('T')[0] : new Date(o.createdAt).toISOString().split('T')[0]) : '',
+    vencimiento: o.createdAt ? (typeof o.createdAt === 'string' ? o.createdAt.split('T')[0] : new Date(o.createdAt).toISOString().split('T')[0]) : '',
+    estado: o.paymentStatus === 'paid' ? 'completada' : o.paymentStatus,
+    subtotal: o.subtotal,
+    descuento: o.discount,
+    impuesto: o.tax,
+    total: o.total,
+    notas: o.notes,
+    terminos: null,
+    metodoPago: o.paymentMethod,
+    items: (o.items || []).map((i: any) => ({
+      id: String(i.id),
+      producto: i.product?.title || `Producto #${i.productId}`,
+      descripcion: null,
+      cantidad: i.quantity,
+      precioUnit: i.price,
+      descuento: 0,
+      total: i.quantity * i.price,
+    })),
+    actividad: [],
+    createdAt: o.createdAt ? (typeof o.createdAt === 'string' ? o.createdAt.split('T')[0] : new Date(o.createdAt).toISOString().split('T')[0]) : '',
+    updatedAt: o.updatedAt ? (typeof o.updatedAt === 'string' ? o.updatedAt.split('T')[0] : new Date(o.updatedAt).toISOString().split('T')[0]) : '',
+  };
+}

@@ -1,0 +1,27 @@
+@use '../../styles/abstracts/variables' as *;
+
+.layout { display: flex; min-height: 100vh; background: var(--bg-primary); }
+
+.mainArea { flex: 1; margin-left: 260px; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; display: flex; flex-direction: column;
+  &.mainExpanded { margin-left: 72px; }
+}
+
+.mobileToggle { display: none; position: fixed; bottom: 24px; left: 24px; z-index: 150; width: 48px; height: 48px; border-radius: 50%; background: $primary-color; border: none; cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 20px rgba($primary-color, 0.4);
+  span { display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px; }
+}
+
+.content { flex: 1; padding: 32px; width: 100%; box-sizing: border-box; overflow-y: auto;
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+}
+
+@media (max-width: 1024px) {
+  .content { padding: 24px 16px; }
+}
+
+@media (max-width: 768px) {
+  .mainArea { margin-left: 0 !important; }
+  .mobileToggle { display: flex; }
+  .content { padding: 16px; }
+}

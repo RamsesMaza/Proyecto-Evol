@@ -1,0 +1,45 @@
+@use '../../styles/abstracts/variables' as *;
+
+.sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: #0f172a; display: flex; flex-direction: column; z-index: 200; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden;
+  &.collapsed { width: 72px; }
+}
+
+.logo { display: flex; align-items: center; justify-content: space-between; padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); min-height: 64px;
+  .collapsed & { justify-content: center; padding: 20px 0; }
+}
+
+.logoText { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+
+.collapseBtn { width: 28px; height: 28px; border-radius: 8px; border: none; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s;
+  .collapsed & { width: 32px; height: 32px; }
+  &:hover { background: rgba(255,255,255,0.1); color: #fff; }
+}
+
+.nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+
+.navItem { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; border: none; background: transparent; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 13px; font-weight: 500; font-family: $font-primary; text-align: left; transition: all 0.15s; white-space: nowrap; width: 100%;
+  .collapsed & { justify-content: center; padding: 10px 0; }
+  &:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+  &.navItemActive { background: rgba($primary-color, 0.15); color: $primary-color; }
+}
+
+.navIcon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+
+.navLabel { overflow: hidden; text-overflow: ellipsis; }
+
+.footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.06);
+  .collapsed & { display: none; }
+}
+
+.footerText { font-size: 11px; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 6px;
+  svg { font-size: 12px; }
+}
+
+.overlay { display: none; }
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%);
+    &.mobileOpen { transform: translateX(0); }
+  }
+  .overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
+}

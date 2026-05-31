@@ -10,6 +10,9 @@ import productRoutes from './routes/products.routes';
 import categoryRoutes from './routes/categories.routes';
 import orderRoutes from './routes/orders.routes';
 import paymentRoutes from './routes/payments.routes';
+import userRoutes from './routes/users.routes';
+import cotizacionRoutes from './routes/cotizaciones.routes';
+import adminTiRoutes from './routes/admin-ti.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +47,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/cotizaciones', cotizacionRoutes);
+app.use('/api/admin-ti', adminTiRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

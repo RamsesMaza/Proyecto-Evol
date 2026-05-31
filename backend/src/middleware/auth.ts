@@ -7,6 +7,8 @@ interface JwtPayload {
   userId: number;
   email: string;
   role: string;
+  firstName: string;
+  lastName: string;
 }
 
 declare global {
