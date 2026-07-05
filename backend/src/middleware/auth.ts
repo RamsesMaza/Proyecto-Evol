@@ -1,20 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_change_me';
-
-interface JwtPayload {
-  userId: number;
-  email: string;
-  role: string;
-  firstName: string;
-  lastName: string;
-}
+import { verifyToken } from '../lib/auth';
 
 declare global {
   namespace Express {
-    interface Request {
-      user?: JwtPayload;
+    interface User {
+      userId: number;
+      email: string;
+      role: string;
+      firstName: string;
+      lastName: string;
     }
   }
 }
@@ -28,7 +22,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
   try {
     const token = authHeader.slice(7);
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = verifyToken(token) as Express.User;
     req.user = decoded;
     next();
   } catch {

@@ -45,7 +45,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
       }
 
       const token = generateToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName });
-      done(null, { user, token });
+      done(null, { user, token } as any);
     } catch (err) {
       done(err as Error);
     }
@@ -61,5 +61,8 @@ passport.serializeUser((data: any, done) => {
 passport.deserializeUser((data: any, done) => {
   done(null, data);
 });
+
+// This is needed because Passport's User type doesn't match our serialized data
+export {};
 
 export default passport;
