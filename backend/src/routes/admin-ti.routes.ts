@@ -14,6 +14,7 @@ router.use(requireRole('ADMIN', 'TI'));
 
 /* Dashboard */
 router.get('/dashboard/stats', TiDashboardController.stats);
+router.get('/finanzas', TiDashboardController.finanzas);
 router.get('/sessions', TiDashboardController.sessions);
 router.delete('/sessions/:id', TiDashboardController.closeSession);
 

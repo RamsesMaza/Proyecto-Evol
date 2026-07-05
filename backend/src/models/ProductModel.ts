@@ -127,6 +127,84 @@ export const ProductModel = {
     return { ...product, related };
   },
 
+  async create(data: {
+    title: string; name?: string; description?: string; fullDescription?: string;
+    price: number; oldPrice?: number; categoryId: number; image?: string; stock?: number;
+    isNew?: boolean; isFeatured?: boolean; isOffer?: boolean;
+    images?: string[]; specs?: { key: string; value: string }[];
+  }) {
+    const product = await prisma.product.create({
+      data: {
+        title: data.title,
+        name: data.name || data.title,
+        description: data.description || '',
+        fullDescription: data.fullDescription,
+        price: data.price,
+        oldPrice: data.oldPrice,
+        categoryId: data.categoryId,
+        image: data.image,
+        stock: data.stock ?? 0,
+        isNew: data.isNew ?? false,
+        isFeatured: data.isFeatured ?? false,
+        isOffer: data.isOffer ?? false,
+        ...(data.images?.length ? {
+          productImages: { create: data.images.map((url, i) => ({ url, order: i })) },
+        } : {}),
+        ...(data.specs?.length ? {
+          productSpecs: { create: data.specs.map(s => ({ key: s.key, value: s.value })) },
+        } : {}),
+      },
+      include: { category: true, productImages: { orderBy: { order: 'asc' } }, productSpecs: true },
+    });
+    return normalizeProduct(product);
+  },
+
+  async update(id: number, data: {
+    title?: string; name?: string; description?: string; fullDescription?: string;
+    price?: number; oldPrice?: number | null; categoryId?: number; image?: string | null; stock?: number;
+    isNew?: boolean; isFeatured?: boolean; isOffer?: boolean;
+    images?: string[]; specs?: { key: string; value: string }[];
+  }) {
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundError('Producto');
+
+    const updateData: any = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.fullDescription !== undefined) updateData.fullDescription = data.fullDescription;
+    if (data.price !== undefined) updateData.price = data.price;
+    if (data.oldPrice !== undefined) updateData.oldPrice = data.oldPrice;
+    if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+    if (data.image !== undefined) updateData.image = data.image;
+    if (data.stock !== undefined) updateData.stock = data.stock;
+    if (data.isNew !== undefined) updateData.isNew = data.isNew;
+    if (data.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
+    if (data.isOffer !== undefined) updateData.isOffer = data.isOffer;
+
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        ...updateData,
+        ...(data.images ? {
+          productImages: { deleteMany: {}, create: data.images.map((url, i) => ({ url, order: i })) },
+        } : {}),
+        ...(data.specs ? {
+          productSpecs: { deleteMany: {}, create: data.specs.map(s => ({ key: s.key, value: s.value })) },
+        } : {}),
+      },
+      include: { category: true, productImages: { orderBy: { order: 'asc' } }, productSpecs: true },
+    });
+    return normalizeProduct(product);
+  },
+
+  async delete(id: number) {
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundError('Producto');
+    await prisma.product.delete({ where: { id } });
+    return { message: 'Producto eliminado correctamente' };
+  },
+
   async createReviewForProduct(productId: number, data: { userName: string; rating: number; comment?: string }) {
     const product = await this.findById(productId);
     if (!product) throw new NotFoundError('Producto');

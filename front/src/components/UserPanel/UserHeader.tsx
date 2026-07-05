@@ -119,7 +119,7 @@ const UserHeader = ({ onNavigate }: { onNavigate?: (section: string) => void }) 
   const clearNotifs = () => setNotifications([]);
   const clearMsgs = () => setMessages([]);
 
-  const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 'U';
+  const initials = user?.firstName && user?.lastName ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 'U';
 
   const handleNavigate = (section: string) => {
     setProfileOpen(false);

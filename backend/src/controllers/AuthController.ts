@@ -165,4 +165,14 @@ export const AuthController = {
       res.status(200).json(result);
     } catch (err) { next(err); }
   },
+
+  me: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req as any).user.userId;
+      const user = await AuthModel.getUserById(userId);
+      if (!user) { res.status(404).json({ error: 'Usuario no encontrado' }); return; }
+      const { password: _, ...safe } = user;
+      res.json(safe);
+    } catch (err) { next(err); }
+  },
 };

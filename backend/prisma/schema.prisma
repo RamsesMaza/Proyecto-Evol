@@ -12,6 +12,40 @@ enum Role {
   USER
   SALES
   TI
+  MARKETING
+  AUDITOR
+}
+
+enum LeadStatus {
+  nuevo
+  contactado
+  interesado
+  en_negociacion
+  convertido
+  perdido
+}
+
+enum LeadPriority {
+  baja
+  media
+  alta
+  urgente
+}
+
+enum CampaignStatus {
+  borrador
+  activa
+  pausada
+  finalizada
+  cancelada
+}
+
+enum CampaignType {
+  email
+  sms
+  redes
+  evento
+  otro
 }
 
 model User {
@@ -29,12 +63,25 @@ model User {
   twoFactorMethod   String?  @default("email")
   twoFactorSecret   String?
   phoneVerified     Boolean  @default(false)
+  googleId          String?  @unique
+  googleAvatar      String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   ticketsCreated  SupportTicket[] @relation("TicketCreator")
   ticketsAssigned SupportTicket[] @relation("TicketAssignee")
   sessions        UserSession[]
+  assignedLeads     Lead[]          @relation("LeadAssignee")
+  assignedCampaigns Campaign[]      @relation("CampaignAssignee")
+  leadActivities    LeadActivity[]  @relation("ActivityPerformer")
+  createdSegments   Segment[]       @relation("SegmentCreator")
+  segmentMemberships SegmentMember[]
+  createdCertificates Certificate[] @relation("CertificateCreator")
+  certificates        Certificate[] @relation("CertificateOwner")
+  createdCourses      Course[] @relation("CourseCreator")
+  enrollments         CourseEnrollment[]
+  sentMessages        Message[] @relation("SentMessages")
+  receivedMessages    Message[] @relation("ReceivedMessages")
 
   @@index([status])
   @@index([role])
@@ -331,4 +378,284 @@ model UserSession {
   @@index([userId])
   @@index([token])
   @@index([isActive])
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  userId    Int?
+  type      String    @default("info")
+  title     String
+  message   String?   @db.Text
+  icon      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String? @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id          Int         @id @default(autoincrement())
+  campaignId  Int?
+  campaign    Campaign?   @relation(fields: [campaignId], references: [id])
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  position    String?
+  source      String      @default("web")
+  status      LeadStatus  @default(nuevo)
+  priority    LeadPriority @default(media)
+  assignedTo  Int?
+  assignedUser User?      @relation("LeadAssignee", fields: [assignedTo], references: [id])
+  notes       String?     @db.Text
+  observations String?    @db.Text
+  contactedAt DateTime?
+  convertedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  activities  LeadActivity[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([assignedTo])
+  @@index([campaignId])
+  @@index([email])
+}
+
+model LeadActivity {
+  id          Int      @id @default(autoincrement())
+  leadId      Int
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        String   @default("nota")
+  description String
+  performedBy Int?
+  performedUser User?  @relation("ActivityPerformer", fields: [performedBy], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model Campaign {
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?        @db.Text
+  objective   String?
+  budget      Float          @default(0)
+  spent       Float          @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  status      CampaignStatus @default(borrador)
+  type        CampaignType   @default(otro)
+  assignedTo  Int?
+  assignedUser User?         @relation("CampaignAssignee", fields: [assignedTo], references: [id])
+  leads       Lead[]
+  results     CampaignResult[]
+  emailCampaigns EmailCampaign[]
+  smsCampaigns   SmsCampaign[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([assignedTo])
+}
+
+model CampaignResult {
+  id             Int      @id @default(autoincrement())
+  campaignId     Int
+  campaign       Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  leadsGenerated Int      @default(0)
+  leadsConverted Int      @default(0)
+  revenue        Float    @default(0)
+  roi            Float    @default(0)
+  impressions    Int      @default(0)
+  clicks         Int      @default(0)
+  opens          Int      @default(0)
+  recordedAt     DateTime @default(now())
+
+  @@index([campaignId])
+}
+
+model EmailCampaign {
+  id          Int       @id @default(autoincrement())
+  campaignId  Int
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name        String
+  subject     String
+  body        String    @db.Text
+  template    String?
+  status      String    @default("borrador")
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  recipients  Int       @default(0)
+  opened      Int       @default(0)
+  clicked     Int       @default(0)
+  converted   Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  @@index([campaignId])
+  @@index([status])
+}
+
+model SmsCampaign {
+  id          Int       @id @default(autoincrement())
+  campaignId  Int
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name        String
+  message     String    @db.Text
+  provider    String    @default("twilio")
+  status      String    @default("borrador")
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  sent        Int       @default(0)
+  delivered   Int       @default(0)
+  responded   Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  @@index([campaignId])
+  @@index([status])
+}
+
+model Segment {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  criteria    String?  @db.Text
+  createdBy   Int?
+  creator     User?    @relation("SegmentCreator", fields: [createdBy], references: [id])
+  members     SegmentMember[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SegmentMember {
+  id        Int      @id @default(autoincrement())
+  segmentId Int
+  segment   Segment  @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([segmentId, userId])
+  @@index([segmentId])
+  @@index([userId])
+}
+
+model Certificate {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation("CertificateOwner", fields: [userId], references: [id])
+  title        String
+  description  String?  @db.Text
+  issuer       String   @default("ACS Academy")
+  issueDate    DateTime @default(now())
+  expiryDate   DateTime?
+  imageUrl     String?  @db.Text
+  course       String?
+  hours        Int?
+  credentialId String   @unique
+  createdBy    Int?
+  creator      User?    @relation("CertificateCreator", fields: [createdBy], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdBy])
+  @@index([credentialId])
+}
+
+enum CourseLevel {
+  basico
+  intermedio
+  avanzado
+}
+
+model Course {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?        @db.Text
+  category    String?
+  level       CourseLevel    @default(basico)
+  imageUrl    String?
+  duration    Int?
+  createdBy   Int?
+  creator     User?          @relation("CourseCreator", fields: [createdBy], references: [id])
+  published   Boolean        @default(false)
+  visibleToRoles String?     @default("[]")
+  visibleToUsers String?     @default("[]")
+  modules     CourseModule[]
+  enrollments CourseEnrollment[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([createdBy])
+  @@index([published])
+}
+
+model CourseModule {
+  id          Int             @id @default(autoincrement())
+  courseId     Int
+  course      Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int             @default(0)
+  materials   CourseMaterial[]
+  createdAt   DateTime        @default(now())
+
+  @@index([courseId])
+}
+
+model CourseMaterial {
+  id         Int           @id @default(autoincrement())
+  moduleId   Int
+  module     CourseModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title      String
+  type       String        @default("pdf")
+  fileUrl    String?
+  embedUrl   String?
+  duration   Int?
+  createdAt  DateTime      @default(now())
+
+  @@index([moduleId])
+}
+
+model CourseEnrollment {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  progress  Float    @default(0)
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  senderId  Int
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId Int?
+  receiver  User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  subject   String?
+  body      String   @db.Text
+  read      Boolean  @default(false)
+  parentId  Int?
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([parentId])
 }

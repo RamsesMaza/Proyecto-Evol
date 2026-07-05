@@ -88,6 +88,7 @@ const UserPanel = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [entered, setEntered] = useState(false);
+  const [pendingContactId, setPendingContactId] = useState<number | null>(null);
 
   useEffect(() => { setEntered(true); }, []);
 
@@ -141,7 +142,7 @@ const UserPanel = () => {
     setters[section]?.((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 'U';
+  const initials = user && user.firstName && user.lastName ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 'U';
   const displayEmail = user?.email || profile.email || 'No especificado';
   const displayPhone = user?.phone || profile.phone || 'No especificado';
   const displayAddress = profile.address || address.address || 'No especificado';
@@ -416,9 +417,13 @@ const UserPanel = () => {
 
           {activeSection === 'certificados' && <Certificates />}
 
-          {activeSection === 'cursos' && <Courses />}
+          {activeSection === 'cursos' && (
+            <Courses onContactInstructor={(userId) => { setPendingContactId(userId); setActiveSection('mensajes'); }} />
+          )}
 
-          {activeSection === 'mensajes' && <Messages />}
+          {activeSection === 'mensajes' && (
+            <Messages pendingContactId={pendingContactId} onContactConsumed={() => setPendingContactId(null)} />
+          )}
           {activeSection === 'seguridad' && <SecuritySettings />}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { FaTachometerAlt, FaUsers, FaUserShield, FaHeadset, FaHistory, FaShieldAlt, FaChevronLeft, FaChevronRight, FaCog } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaUserShield, FaHeadset, FaHistory, FaShieldAlt, FaChevronLeft, FaChevronRight, FaCog, FaChartBar } from 'react-icons/fa';
 import styles from './AdminTiSidebar.module.scss';
 
 const sections = [
@@ -8,6 +8,7 @@ const sections = [
   { key: 'soporte', label: 'Soporte Técnico', icon: <FaHeadset /> },
   { key: 'auditoria', label: 'Auditoría', icon: <FaHistory /> },
   { key: 'seguridad', label: 'Seguridad', icon: <FaShieldAlt /> },
+  { key: 'reportes', label: 'Reportes', icon: <FaChartBar /> },
 ];
 
 interface Props {

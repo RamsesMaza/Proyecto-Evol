@@ -21,10 +21,46 @@ export const createReviewSchema = z.object({
   comment: z.string().optional(),
 });
 
+export const createProductSchema = z.object({
+  title: z.string().min(1, 'El título es obligatorio'),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  fullDescription: z.string().optional(),
+  price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
+  oldPrice: z.number().optional(),
+  categoryId: z.number().int().positive('Seleccione una categoría'),
+  image: z.string().optional(),
+  stock: z.number().int().min(0).default(0),
+  isNew: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isOffer: z.boolean().optional(),
+  images: z.array(z.string()).optional(),
+  specs: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
+});
+
+export const updateProductSchema = z.object({
+  title: z.string().min(1).optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  fullDescription: z.string().optional(),
+  price: z.number().min(0).optional(),
+  oldPrice: z.number().nullable().optional(),
+  categoryId: z.number().int().positive().optional(),
+  image: z.string().nullable().optional(),
+  stock: z.number().int().min(0).optional(),
+  isNew: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isOffer: z.boolean().optional(),
+  images: z.array(z.string()).optional(),
+  specs: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
+});
+
 export const ProductController = {
   validate: {
     list: validate(productQuerySchema, 'query'),
     createReview: validate(createReviewSchema),
+    create: validate(createProductSchema),
+    update: validate(updateProductSchema),
   },
 
   list: async (req: Request, res: Response, next: NextFunction) => {
@@ -42,6 +78,27 @@ export const ProductController = {
   getById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await ProductModel.getById(Number(req.params.id));
+      res.json(result);
+    } catch (err) { next(err); }
+  },
+
+  create: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await ProductModel.create(req.body);
+      res.status(201).json(result);
+    } catch (err) { next(err); }
+  },
+
+  update: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await ProductModel.update(Number(req.params.id), req.body);
+      res.json(result);
+    } catch (err) { next(err); }
+  },
+
+  delete: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await ProductModel.delete(Number(req.params.id));
       res.json(result);
     } catch (err) { next(err); }
   },

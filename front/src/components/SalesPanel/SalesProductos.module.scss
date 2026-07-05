@@ -1,0 +1,51 @@
+@use '../../styles/abstracts/variables' as *;
+
+.module { width: 100%; }
+
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+.headerLeft { display: flex; align-items: center; gap: 14px; }
+.headerIcon { width: 44px; height: 44px; border-radius: 12px; background: rgba(#f59e0b, 0.08); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0; }
+.subtitle { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; font-weight: 500; }
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 60px 20px; gap: 10px; color: var(--text-secondary); font-size: 14px; }
+.spinner { animation: spin 0.8s linear infinite; font-size: 20px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.filterBar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.searchWrap { position: relative; flex: 1; min-width: 200px; }
+.searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; pointer-events: none; }
+.searchInput { width: 100%; padding: 10px 36px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: $font-primary; outline: none; box-sizing: border-box;
+  &:focus { border-color: $primary-color; }
+}
+.clearBtn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 4px; }
+.filterSelect { padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: $font-primary; outline: none; min-width: 180px;
+  &:focus { border-color: $primary-color; }
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { border-radius: 12px; border: 1px solid var(--border-light); background: var(--bg-card); overflow: hidden; transition: all 0.2s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+}
+.imageWrap { position: relative; height: 150px; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.image { width: 100%; height: 100%; object-fit: contain; }
+.noImage { font-size: 32px; color: var(--text-muted); }
+.badge { position: absolute; bottom: 6px; left: 6px; padding: 2px 8px; border-radius: 6px; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; }
+.badgeFeatured { position: absolute; bottom: 6px; right: 6px; padding: 2px 8px; border-radius: 6px; background: #8b5cf6; color: #fff; font-size: 10px; font-weight: 700; }
+.info { padding: 12px; }
+.name { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.cat { font-size: 11px; color: var(--text-muted); }
+.row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.price { font-size: 15px; font-weight: 800; color: $primary-color; }
+.rating { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 3px; svg { color: #f59e0b; font-size: 10px; } }
+.stock { font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px; }
+.empty { grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; }
+
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+.pageInfo { font-size: 12px; color: var(--text-muted); }
+.pageBtns { display: flex; gap: 4px; }
+.pageBtn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer; font-family: $font-primary;
+  &:hover:not(:disabled) { border-color: $primary-color; color: $primary-color; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+.pageBtnActive { background: $primary-color; border-color: $primary-color; color: #fff; }

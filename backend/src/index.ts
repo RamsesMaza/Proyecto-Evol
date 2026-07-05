@@ -3,6 +3,7 @@ import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import passport from './lib/passport';
 import { errorHandler } from './middleware/errorHandler';
 
 import authRoutes from './routes/auth.routes';
@@ -13,6 +14,14 @@ import paymentRoutes from './routes/payments.routes';
 import userRoutes from './routes/users.routes';
 import cotizacionRoutes from './routes/cotizaciones.routes';
 import adminTiRoutes from './routes/admin-ti.routes';
+import notificationRoutes from './routes/notifications.routes';
+import settingsRoutes from './routes/settings.routes';
+import marketingRoutes from './routes/marketing.routes';
+import reportsRoutes from './routes/reports.routes';
+import certificatesRoutes from './routes/certificates.routes';
+import coursesRoutes from './routes/courses.routes';
+import messagesRoutes from './routes/messages.routes';
+import usersRoutes from './routes/users.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +48,8 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/', authLimiter);
 
+app.use(passport.initialize());
+
 app.use(express.json({ limit: '10mb' }));
 
 // Routes
@@ -50,6 +61,14 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/cotizaciones', cotizacionRoutes);
 app.use('/api/admin-ti', adminTiRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/marketing', marketingRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/certificates', certificatesRoutes);
+app.use('/api/courses', coursesRoutes);
+app.use('/api/messages', messagesRoutes);
+app.use('/api/users', usersRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

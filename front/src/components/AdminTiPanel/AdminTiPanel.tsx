@@ -6,6 +6,7 @@ import AdminTiRoles from './AdminTiRoles';
 import AdminTiSupport from './AdminTiSupport';
 import AdminTiAudit from './AdminTiAudit';
 import AdminTiSecurity from './AdminTiSecurity';
+import ReportesGenerales from '../ReportesGenerales/ReportesGenerales';
 import UserHeader from '../UserPanel/UserHeader';
 import styles from './AdminTiPanel.module.scss';
 
@@ -31,6 +32,7 @@ const AdminTiPanel = () => {
           {activeSection === 'soporte' && <AdminTiSupport />}
           {activeSection === 'auditoria' && <AdminTiAudit />}
           {activeSection === 'seguridad' && <AdminTiSecurity />}
+          {activeSection === 'reportes' && <ReportesGenerales />}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaUserShield, FaSyncAlt, FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
 import { fetchPermissions, fetchRolePermissions, assignPermission, removePermission, createPermission, type Permission } from '../../services/adminTiApi';
 import styles from './AdminTiRoles.module.scss';
@@ -94,8 +94,8 @@ const AdminTiRoles = () => {
             </tr></thead>
             <tbody>
               {modules.map(mod => (
-                <>
-                  <tr key={mod} className={styles.moduleRow}><td colSpan={4} className={styles.moduleLabel}>{mod}</td></tr>
+                <React.Fragment key={mod}>
+                  <tr className={styles.moduleRow}><td colSpan={4} className={styles.moduleLabel}>{mod}</td></tr>
                   {permissions.filter(p => p.module === mod).map(p => (
                     <tr key={p.id} className={styles.tr}>
                       <td><span className={styles.permName}>{p.name}</span><span className={styles.permDesc}>{p.description}</span></td>
@@ -109,7 +109,7 @@ const AdminTiRoles = () => {
                       </td>
                     </tr>
                   ))}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>

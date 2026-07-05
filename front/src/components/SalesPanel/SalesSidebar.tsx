@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { FaHome, FaUsers, FaChartLine, FaChartBar, FaCog, FaSignOutAlt, FaChevronLeft, FaTimes, FaBars } from 'react-icons/fa';
+import { FaHome, FaUsers, FaChartLine, FaChartBar, FaBox, FaCog, FaSignOutAlt, FaChevronLeft, FaTimes, FaBars } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import styles from './SalesSidebar.module.scss';
 
 const menuItems = [
   { key: 'inicio', label: 'Inicio', icon: <FaHome /> },
   { key: 'clientes', label: 'Clientes', icon: <FaUsers /> },
+  { key: 'productos', label: 'Productos', icon: <FaBox /> },
   { key: 'ventas', label: 'Ventas', icon: <FaChartLine /> },
   { key: 'reportes', label: 'Reportes', icon: <FaChartBar /> },
   { key: 'configuracion', label: 'Configuración', icon: <FaCog /> },

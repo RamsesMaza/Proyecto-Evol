@@ -175,7 +175,7 @@ const AdminTiUsers = () => {
                       <button className={styles.actionBtn} title="Editar" onClick={() => openEdit(u)}><FaEdit /></button>
                       <select className={styles.quickAction} onChange={e => { if (e.target.value) handleStatusChange(u.id, e.target.value); e.target.value = ''; }} defaultValue="">
                         <option value="" disabled>Estado...</option>
-                        {statusActions.map(a => <option key={a.status} value={a.status}>{a.label}</option>)}
+                        {statusActions.map((a, i) => <option key={`${a.status}-${i}`} value={a.status}>{a.label}</option>)}
                       </select>
                       <select className={styles.quickAction} onChange={e => { if (e.target.value) handleRoleChange(u.id, e.target.value); e.target.value = ''; }} defaultValue="">
                         <option value="" disabled>Rol...</option>

@@ -1,15 +1,7 @@
 import type { Cliente, ClienteStats, FilterPreset } from '../components/SalesPanel/Clientes/types';
+import { api as http } from './httpClient';
 
 const BASE = '/api/users/clientes';
-
-function getToken(): string | null {
-  return localStorage.getItem('token');
-}
-
-function authHeaders(): Record<string, string> {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 function parseCliente(c: any): Cliente {
   return {
@@ -18,74 +10,51 @@ function parseCliente(c: any): Cliente {
     tags: c.tags || [],
     createdAt: typeof c.createdAt === 'string' ? c.createdAt.split('T')[0] : c.createdAt,
     updatedAt: typeof c.updatedAt === 'string' ? c.updatedAt.split('T')[0] : c.updatedAt,
-    ultimaCompra: c.ultimaCompra ? (typeof c.ultimaCompra === 'string' ? c.ultimaCompra.split('T')[0] : c.ultimaCompra) : null,
-    activity: (c.activity || []).map((a: any) => ({
-      ...a,
-      date: typeof a.date === 'string' ? a.date.split('T')[0] : a.date,
-    })),
-    cotizaciones: (c.cotizaciones || []).map((cq: any) => ({
-      ...cq,
-      date: typeof cq.date === 'string' ? cq.date.split('T')[0] : cq.date,
-    })),
-    notas: (c.notas || []).map((n: any) => ({
-      ...n,
-      date: typeof n.date === 'string' ? n.date.split('T')[0] : n.date,
-    })),
   };
 }
 
 export async function fetchClientes(params: {
-  query?: string;
-  status?: FilterPreset;
-  page?: number;
-  pageSize?: number;
-  sortField?: string;
-  sortDir?: 'asc' | 'desc';
-}): Promise<{ clientes: Cliente[]; total: number }> {
-  const searchParams = new URLSearchParams();
-  if (params.query) searchParams.set('query', params.query);
-  if (params.status && params.status !== 'todos') searchParams.set('status', params.status);
-  if (params.page !== undefined) searchParams.set('page', String(params.page));
-  if (params.pageSize !== undefined) searchParams.set('pageSize', String(params.pageSize));
-  if (params.sortField) searchParams.set('sortField', params.sortField);
-  if (params.sortDir) searchParams.set('sortDir', params.sortDir);
-
-  const res = await fetch(`${BASE}?${searchParams.toString()}`);
-  if (!res.ok) throw new Error('Error al cargar clientes');
-  const data = await res.json();
-  return {
-    clientes: data.clientes.map(parseCliente),
-    total: data.total,
-  };
+  search?: string; tag?: string; orderBy?: string; dir?: string;
+  page?: number; pageSize?: number; filter?: FilterPreset;
+}): Promise<{ clientes: Cliente[]; total: number; page: number; pageSize: number; stats: ClienteStats }> {
+  const sp = new URLSearchParams();
+  if (params.search) sp.set('search', params.search);
+  if (params.tag) sp.set('tag', params.tag);
+  if (params.orderBy) sp.set('orderBy', params.orderBy);
+  if (params.dir) sp.set('dir', params.dir);
+  if (params.page !== undefined) sp.set('page', String(params.page));
+  if (params.pageSize !== undefined) sp.set('pageSize', String(params.pageSize));
+  if (params.filter) sp.set('filter', params.filter);
+  const data: any = await http(BASE, `?${sp.toString()}`);
+  return { ...data, clientes: (data.clientes || []).map(parseCliente) };
 }
 
-export async function updateCliente(id: number, data: { status?: string; isFavorite?: boolean }): Promise<void> {
-  const res = await fetch(`${BASE}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al actualizar cliente');
-  }
+export async function fetchCliente(id: number | string): Promise<Cliente> {
+  const data: any = await http(BASE, `/${id}`);
+  return parseCliente(data);
 }
 
-export async function fetchClienteStats(): Promise<ClienteStats> {
-  const res = await fetch(`${BASE}/stats`);
-  if (!res.ok) throw new Error('Error al cargar estadísticas');
-  return res.json();
+export async function createCliente(data: any): Promise<Cliente> {
+  const res: any = await http(BASE, '', { method: 'POST', body: JSON.stringify(data) });
+  return parseCliente(res);
 }
 
-export async function updateMyProfile(data: { phone?: string; company?: string; firstName?: string; lastName?: string }): Promise<{ id: string; firstName: string; lastName: string; email: string; phone: string; company: string }> {
-  const res = await fetch('/api/users/profile', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al actualizar perfil');
-  }
-  return res.json();
+export async function updateCliente(id: number | string, data: any): Promise<Cliente> {
+  const res: any = await http(BASE, `/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  return parseCliente(res);
+}
+
+export async function deleteCliente(id: number | string): Promise<void> {
+  await http(BASE, `/${id}`, { method: 'DELETE' });
+}
+
+export async function fetchClientesStats(): Promise<{ stats: ClienteStats }> {
+  return http(BASE, '/stats');
+}
+
+/** @deprecated Use fetchClientesStats */
+export const fetchClienteStats = fetchClientesStats;
+
+export async function updateMyProfile(data: { phone?: string; company?: string }): Promise<any> {
+  return http('/api/users', '/profile', { method: 'PUT', body: JSON.stringify(data) });
 }

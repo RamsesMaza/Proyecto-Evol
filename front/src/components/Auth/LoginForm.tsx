@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useAuth } from '../../context/AuthContext';
 import TwoFactorForm from './TwoFactorForm';
@@ -20,6 +20,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
   const [error, setError] = useState('');
   const [show2FA, setShow2FA] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const user = { id: payload.userId, email: payload.email, firstName: payload.firstName || '', lastName: payload.lastName || '', role: payload.role };
+        localStorage.setItem('user', JSON.stringify(user));
+        window.location.href = '/panel';
+      } catch {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +126,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
 
           <div className={`${styles.divider} ${styles.animatedGroup}`}>o</div>
 
-          <button type="button" className={`${styles.googleBtn} ${styles.animatedGroup}`}>
+          <button type="button" className={`${styles.googleBtn} ${styles.animatedGroup}`} onClick={() => window.location.href = '/api/auth/google'}>
             Iniciar sesión con Google <FcGoogle size={20} />
           </button>
 

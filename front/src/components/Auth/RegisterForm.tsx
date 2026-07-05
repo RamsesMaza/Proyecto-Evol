@@ -205,7 +205,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchMode, onSuccess, on
 
           <div className={`${styles.divider} ${styles.animatedGroup}`}>o</div>
 
-          <button type="button" className={`${styles.googleBtn} ${styles.animatedGroup}`}>
+          <button type="button" className={`${styles.googleBtn} ${styles.animatedGroup}`} onClick={() => window.location.href = '/api/auth/google'}>
             Registrarse con Google <FcGoogle size={20} />
           </button>
 

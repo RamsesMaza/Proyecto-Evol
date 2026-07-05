@@ -1,24 +1,9 @@
+import { api as http } from './httpClient';
+
 const BASE = '/api/admin-ti';
 
-function getToken(): string | null {
-  return localStorage.getItem('token');
-}
-
-function authHeaders(): Record<string, string> {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...authHeaders(), ...options?.headers },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: 'Error de conexión' }));
-    throw new Error(err.error || `Error ${res.status}`);
-  }
-  return res.json();
+  return http<T>(BASE, path, options);
 }
 
 /* Dashboard */
@@ -33,6 +18,29 @@ export interface TiDashboardStats {
 
 export function fetchTiDashboardStats(): Promise<TiDashboardStats> {
   return api('/dashboard/stats');
+}
+
+/* Finanzas */
+export interface FinanzasData {
+  revenue: {
+    total: number; thisMonth: number; today: number;
+    lastMonth: number; averageOrder: number; paidOrders: number;
+  };
+  paymentMethods: Array<{ method: string; count: number; total: number }>;
+  financials: {
+    taxCollected: number; discountsGiven: number;
+    shippingCollected: number; refunded: number;
+  };
+  monthlyRevenue: Array<{ month: string; total: number; count: number; tax: number }>;
+  topProducts: Array<{ productId: number; productName: string; quantity: number; revenue: number }>;
+  cotizaciones: {
+    projectedRevenue: number; pendingRevenue: number;
+    total: number; approvedCount: number; pendingCount: number; conversionRate: number;
+  };
+}
+
+export function fetchFinanzas(): Promise<FinanzasData> {
+  return api('/finanzas');
 }
 
 /* Users */

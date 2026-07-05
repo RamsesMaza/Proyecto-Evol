@@ -15,7 +15,7 @@ const ClienteProfile = ({ cliente, onClose, onToggleFavorite }: ClienteProfilePr
   const [tab, setTab] = useState<ProfileTab>('info');
   const c = cliente;
 
-  const initials = `${c.firstName.charAt(0)}${c.lastName.charAt(0)}`.toUpperCase();
+  const initials = `${(c.firstName || '?').charAt(0)}${(c.lastName || '?').charAt(0)}`.toUpperCase();
 
   const tabs: { key: ProfileTab; label: string }[] = [
     { key: 'info', label: 'Información' },

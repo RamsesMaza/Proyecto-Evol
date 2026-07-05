@@ -471,6 +471,27 @@
   margin: 1px 0 0;
 }
 
+.contactBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #7c3aed;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  svg { font-size: 13px; }
+  &:hover { border-color: #7c3aed; background: rgba(124,58,237,0.04); }
+}
+
 /* Progress bar */
 .progressBar {
   height: 6px;
@@ -552,6 +573,95 @@
   }
 }
 
+.quickInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+  padding: 8px 0;
+}
+
+.videoBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: transform 0.15s;
+  margin-bottom: 12px;
+  &:hover { transform: translateY(-1px); }
+  svg { font-size: 16px; }
+}
+
+.videoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.videoModal {
+  background: #fff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+
+.videoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.videoTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.videoClose {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.videoFrame {
+  flex: 1;
+  padding: 16px;
+  min-height: 0;
+}
+
 /* ═══════════════ RESPONSIVE ═══════════════ */
 @media (max-width: 900px) {
   .body {
@@ -611,4 +721,21 @@
   .weekSections {
     padding: 0 14px 12px;
   }
+}
+
+.loadingWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+}
+
+.spin {
+  animation: spin 0.6s linear infinite;
+  font-size: 32px;
+  color: #7c3aed;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

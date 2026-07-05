@@ -81,7 +81,7 @@ const ClienteTable = ({ clientes, onView, onEdit, onDelete, onBlock, onMessage, 
     }
   };
 
-  const initials = (c: Cliente) => `${c.firstName.charAt(0)}${c.lastName.charAt(0)}`.toUpperCase();
+  const initials = (c: Cliente) => `${(c.firstName || '?').charAt(0)}${(c.lastName || '?').charAt(0)}`.toUpperCase();
 
   const sortArrow = (field: SortField) => {
     if (sortField !== field) return <FaSort className={styles.sortIcon} />;

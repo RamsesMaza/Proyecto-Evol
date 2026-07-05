@@ -1,15 +1,7 @@
 import type { Cotizacion, CotizacionStats, CotizacionFormData, FilterPreset, SortField, SortDir } from '../components/SalesPanel/Cotizaciones/types';
+import { api as http } from './httpClient';
 
 const BASE = '/api/cotizaciones';
-
-function getToken(): string | null {
-  return localStorage.getItem('token');
-}
-
-function authHeaders(): Record<string, string> {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 export async function fetchCotizaciones(params: {
   query?: string;
@@ -18,78 +10,44 @@ export async function fetchCotizaciones(params: {
   pageSize?: number;
   sortField?: SortField;
   sortDir?: SortDir;
-}): Promise<{ cotizaciones: Cotizacion[]; total: number }> {
-  const searchParams = new URLSearchParams();
-  if (params.query) searchParams.set('query', params.query);
-  if (params.estado && params.estado !== 'todas') searchParams.set('estado', params.estado);
-  if (params.page !== undefined) searchParams.set('page', String(params.page));
-  if (params.pageSize !== undefined) searchParams.set('pageSize', String(params.pageSize));
-  if (params.sortField) searchParams.set('sortField', params.sortField);
-  if (params.sortDir) searchParams.set('sortDir', params.sortDir);
-
-  const res = await fetch(`${BASE}?${searchParams.toString()}`);
-  if (!res.ok) throw new Error('Error al cargar cotizaciones');
-  return res.json();
+}): Promise<{ cotizaciones: Cotizacion[]; total: number; page: number; pageSize: number }> {
+  const sp = new URLSearchParams();
+  if (params.query) sp.set('query', params.query);
+  if (params.estado) sp.set('estado', params.estado);
+  if (params.page !== undefined) sp.set('page', String(params.page));
+  if (params.pageSize !== undefined) sp.set('pageSize', String(params.pageSize));
+  if (params.sortField) sp.set('sortField', params.sortField);
+  if (params.sortDir) sp.set('sortDir', params.sortDir);
+  return http(BASE, `?${sp.toString()}`);
 }
 
 export async function fetchCotizacion(id: number): Promise<Cotizacion> {
-  const res = await fetch(`${BASE}/${id}`);
-  if (!res.ok) throw new Error('Error al cargar cotización');
-  return res.json();
+  return http(BASE, `/${id}`);
 }
 
 export async function createCotizacion(data: CotizacionFormData): Promise<Cotizacion> {
-  const res = await fetch(BASE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al crear cotización');
-  }
-  return res.json();
+  return http(BASE, '', { method: 'POST', body: JSON.stringify(data) });
 }
 
 export async function updateCotizacion(id: number, data: Partial<CotizacionFormData>): Promise<Cotizacion> {
-  const res = await fetch(`${BASE}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al actualizar cotización');
-  }
-  return res.json();
-}
-
-export async function updateCotizacionStatus(id: number, estado: string): Promise<Cotizacion> {
-  const res = await fetch(`${BASE}/${id}/status`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ estado }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al actualizar estado');
-  }
-  return res.json();
+  return http(BASE, `/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 }
 
 export async function deleteCotizacion(id: number): Promise<void> {
-  const res = await fetch(`${BASE}/${id}`, {
-    method: 'DELETE',
-    headers: { ...authHeaders() },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Error al eliminar cotización');
-  }
+  await http(BASE, `/${id}`, { method: 'DELETE' });
 }
 
-export async function fetchCotizacionStats(): Promise<CotizacionStats> {
-  const res = await fetch(`${BASE}/stats`);
-  if (!res.ok) throw new Error('Error al cargar estadísticas');
-  return res.json();
+export async function fetchCotizacionesStats(): Promise<CotizacionStats> {
+  return http(BASE, '/stats');
+}
+
+/** @deprecated Use fetchCotizacionesStats */
+export const fetchCotizacionStats = fetchCotizacionesStats;
+
+export async function fetchCotizacionVersions(id: number): Promise<{ versions: any[] }> {
+  return http(BASE, `/${id}/versions`);
+}
+
+export async function restoreCotizacionVersion(id: number, versionId: number): Promise<Cotizacion> {
+  return http(BASE, `/${id}/versions/${versionId}/restore`, { method: 'POST' });
 }

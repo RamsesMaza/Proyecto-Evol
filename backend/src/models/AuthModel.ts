@@ -437,4 +437,8 @@ export const AuthModel = {
 
     return { message: 'Contraseña actualizada correctamente' };
   },
+
+  async getUserById(id: number) {
+    return prisma.user.findUnique({ where: { id } });
+  },
 };
