@@ -2,7 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
-import './styles/main.scss'; 
+import { initSentry } from './lib/sentry';
+import './styles/main.scss';
+
+initSentry();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

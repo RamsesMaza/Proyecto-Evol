@@ -91,6 +91,15 @@ export const CertificateModel = {
     });
   },
 
+  async verifyByCredentialId(credentialId: string) {
+    return prisma.certificate.findUnique({
+      where: { credentialId },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
+      },
+    });
+  },
+
   async delete(id: number, userId?: number, ip?: string) {
     const cert = await prisma.certificate.findUnique({ where: { id } });
     if (!cert) throw new Error('Certificado no encontrado');

@@ -25,7 +25,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
-      localStorage.setItem('token', token);
+      localStorage.setItem('accessToken', token);
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const user = { id: payload.userId, email: payload.email, firstName: payload.firstName || '', lastName: payload.lastName || '', role: payload.role };
@@ -73,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
         return;
       }
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
 
       onSuccess("Has iniciado sesión exitosamente. ¡Bienvenido a American Certification Service!", "¡Bienvenido!", () => { window.location.href = '/panel'; });

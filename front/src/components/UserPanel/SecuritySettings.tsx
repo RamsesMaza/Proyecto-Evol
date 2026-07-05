@@ -3,7 +3,7 @@ import { FaShieldAlt, FaCheck, FaTimes, FaExclamationTriangle, FaSpinner, FaMobi
 import { useAuth } from '../../context/AuthContext';
 import styles from './SecuritySettings.module.scss';
 
-function getToken() { return localStorage.getItem('token'); }
+function getToken() { return localStorage.getItem('accessToken'); }
 function authHeaders(): Record<string, string> { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {}; }
 async function api(path: string, opts?: RequestInit) {
   const h: Record<string, string> = { 'Content-Type': 'application/json', ...authHeaders() };

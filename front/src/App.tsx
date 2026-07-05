@@ -8,6 +8,7 @@ import { CartProvider } from "./context/CartContext";
 import { ToastProvider } from "./context/ToastContext";
 import { AuthProvider } from "./context/AuthContext";
 import CartDrawer from "./components/CartDrawer/CartDrawer";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import styles from "./app.module.scss";
 
@@ -20,7 +21,9 @@ function AppContent() {
     <>
       {!isAuthPage && <Header />}
       <main>
-        <AppRouter />
+        <ErrorBoundary>
+          <AppRouter />
+        </ErrorBoundary>
         {!isAuthPage && (
           <>
             <a

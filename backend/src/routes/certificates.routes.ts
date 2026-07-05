@@ -5,6 +5,9 @@ import { CertificateController } from '../controllers/CertificateController';
 
 const router = Router();
 
+/* Public — verify certificate by credentialId (no auth) */
+router.get('/verify/:credentialId', CertificateController.verify);
+
 router.use(authenticate);
 
 /* Marketing / Admin routes */

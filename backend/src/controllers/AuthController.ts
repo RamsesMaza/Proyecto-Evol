@@ -94,6 +94,16 @@ export const AuthController = {
     try {
       const ipAddress = req.ip || req.socket.remoteAddress || undefined;
       const result = await AuthModel.login({ ...req.body, ipAddress });
+      // Set refresh token as httpOnly cookie
+      if (result.refreshToken) {
+        res.cookie('refreshToken', result.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/api/auth',
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+      }
       res.status(200).json({ message: 'Inicio de sesión exitoso', ...result });
     } catch (err) { next(err); }
   },
@@ -123,6 +133,15 @@ export const AuthController = {
     try {
       const ipAddress = req.ip || req.socket.remoteAddress || undefined;
       const result = await AuthModel.verify2FA({ ...req.body, ipAddress });
+      if (result.refreshToken) {
+        res.cookie('refreshToken', result.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/api/auth',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+      }
       res.status(200).json({ message: 'Verificación exitosa', ...result });
     } catch (err) { next(err); }
   },
@@ -163,6 +182,34 @@ export const AuthController = {
       const userId = (req as any).user.userId;
       const result = await AuthModel.disable2fa(userId, req.body);
       res.status(200).json(result);
+    } catch (err) { next(err); }
+  },
+
+  refresh: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+      if (!refreshToken) {
+        res.status(401).json({ error: 'Token de refresco requerido' });
+        return;
+      }
+      const result = await AuthModel.refresh(refreshToken);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/api/auth',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res.json({ ...result });
+    } catch (err) { next(err); }
+  },
+
+  logout: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+      await AuthModel.logout(refreshToken);
+      res.clearCookie('refreshToken', { path: '/api/auth' });
+      res.json({ message: 'Sesión cerrada correctamente' });
     } catch (err) { next(err); }
   },
 

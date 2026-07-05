@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { setAccessToken } from '../services/httpClient';
+import { refreshToken as refreshApi, logout as logoutApi } from '../services/authApi';
 
 interface User {
   id: number;
@@ -18,7 +20,7 @@ interface AuthContextType {
   partialToken: string | null;
   twoFactorRequired: boolean;
   twoFactorMethod: string | null;
-  login: (user: User, token: string) => void;
+  login: (user: User, accessToken: string) => void;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   setTwoFactorChallenge: (partialToken: string, method: string) => void;
@@ -35,20 +37,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [twoFactorRequired, setTwoFactorRequired] = useState(false);
   const [twoFactorMethod, setTwoFactorMethod] = useState<string | null>(null);
 
+  // On mount, try to restore session
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('accessToken');
     if (storedToken && storedUser) {
+      setAccessToken(storedToken);
+      setToken(storedToken);
       try {
-        setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch { /* ignore corrupt data */ }
+      setLoading(false);
+    } else if (storedUser) {
+      // No access token but has user data — might still have a valid cookie refresh token
+      refreshApi().then(result => {
+        setAccessToken(result.accessToken);
+        setToken(result.accessToken);
+        try {
+          setUser(result.user);
+          localStorage.setItem('user', JSON.stringify(result.user));
+        } catch { /* ignore */ }
+      }).catch(() => {
+        localStorage.removeItem('user');
+      }).finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = (userData: User, tokenStr: string) => {
-    localStorage.setItem('token', tokenStr);
+    setAccessToken(tokenStr);
     localStorage.setItem('user', JSON.stringify(userData));
     setToken(tokenStr);
     setUser(userData);
@@ -58,7 +76,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    logoutApi().catch(() => {}); // Best-effort server-side logout
+    setAccessToken(null);
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);

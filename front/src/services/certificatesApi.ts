@@ -59,3 +59,13 @@ export function fetchCertUsers(search?: string): Promise<{ users: CertUser[] }> 
   const qs = search ? `?search=${encodeURIComponent(search)}` : '';
   return api(`/users${qs}`);
 }
+
+export interface VerifyResponse {
+  valid: boolean;
+  certificate?: Certificate;
+  error?: string;
+}
+
+export function verifyCertificate(credentialId: string): Promise<VerifyResponse> {
+  return api(`/verify/${encodeURIComponent(credentialId)}`);
+}

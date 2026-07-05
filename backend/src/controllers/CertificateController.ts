@@ -43,6 +43,15 @@ export const CertificateController = {
     } catch (err) { next(err); }
   },
 
+  verify: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const credentialId = String(req.params.credentialId);
+      const cert = await CertificateModel.verifyByCredentialId(credentialId);
+      if (!cert) return res.status(404).json({ error: 'Certificado no encontrado', valid: false });
+      res.json({ valid: true, certificate: cert });
+    } catch (err) { next(err); }
+  },
+
   delete: async (req: Request, res: Response, next: NextFunction) => {
     try {
       await CertificateModel.delete(Number(req.params.id), uid(req), getIp(req));

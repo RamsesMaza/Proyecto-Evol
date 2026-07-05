@@ -2,8 +2,19 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
+import { logger } from './logger';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_change_me';
+const JWT_SECRET = (() => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET no está configurado');
+    }
+    console.warn('⚠️  JWT_SECRET no configurado. Usando fallback inseguro solo para desarrollo.');
+    return 'dev_fallback_secret_do_not_use_in_production';
+  }
+  return secret;
+})();
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY || '';
 
 export const hashPassword = async (password: string) => {
@@ -17,6 +28,14 @@ export const comparePassword = async (password: string, hash: string) => {
 
 export const generateToken = (payload: object) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+};
+
+export const generateAccessToken = (payload: object) => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
+};
+
+export const generateRefreshToken = (payload: object) => {
+  return jwt.sign({ ...payload, type: 'refresh' }, JWT_SECRET, { expiresIn: '7d' });
 };
 
 export const generatePartialToken = (payload: object) => {
@@ -59,10 +78,16 @@ export const generateBackupCodes = (count = 8): string[] => {
 };
 
 export const verifyRecaptcha = async (token?: string | null): Promise<boolean> => {
-  if (!token || !RECAPTCHA_SECRET) {
-    if (!token) console.warn('reCAPTCHA token no proporcionado. Saltando validación.');
-    if (!RECAPTCHA_SECRET) console.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación.');
-    return true;
+  const isProd = process.env.NODE_ENV === 'production';
+
+  if (!RECAPTCHA_SECRET) {
+    logger.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación.');
+    return !isProd;
+  }
+
+  if (!token) {
+    logger.warn('reCAPTCHA token no proporcionado.');
+    return !isProd;
   }
 
   try {
@@ -73,13 +98,13 @@ export const verifyRecaptcha = async (token?: string | null): Promise<boolean> =
     });
 
     const data = (await res.json()) as { success: boolean; score?: number };
-    console.log('[reCAPTCHA]', JSON.stringify(data));
+    logger.debug({ recaptchaResponse: data }, 'reCAPTCHA verification');
 
     if (!data.success) return false;
     if (typeof data.score === 'number') return data.score >= 0.5;
     return true;
   } catch (error) {
-    console.error('Error verificando reCAPTCHA:', error);
+    logger.error({ err: error }, 'Error verificando reCAPTCHA');
     return false;
   }
 };

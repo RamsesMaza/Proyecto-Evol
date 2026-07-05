@@ -1,9 +1,9 @@
-import Verify from '../components/VerificaCertificado/Verify/VerifyCertificate'
+import VerifyCertificatePage from '../components/VerificaCertificado/Verify/VerifyCertificate'
 
 const VerifyCertificate = () => {
   return (
     <div>
-      <Verify/>
+      <VerifyCertificatePage/>
     </div>
   )
 }

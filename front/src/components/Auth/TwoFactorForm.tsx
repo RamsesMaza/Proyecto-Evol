@@ -107,9 +107,9 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel, email }) => {
         return;
       }
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
-      login(data.user, data.token);
+      login(data.user, data.accessToken);
       window.location.href = '/panel';
     } catch {
       setError('Error de red. Por favor intenta más tarde.');

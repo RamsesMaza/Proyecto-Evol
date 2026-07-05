@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { hashPassword, comparePassword, generateToken, generatePartialToken, verifyToken, verifyTotp, generateTotpSecret, generateTotpQrCode, verifyRecaptcha } from '../lib/auth';
+import { hashPassword, comparePassword, generateToken, generateAccessToken, generateRefreshToken, generatePartialToken, verifyToken, verifyTotp, generateTotpSecret, generateTotpQrCode, verifyRecaptcha } from '../lib/auth';
 import { sendOtpEmail, send2faOtpEmail } from '../lib/email';
 import { sendSms } from '../lib/sms';
 import { AppError, ValidationError, UnauthorizedError, NotFoundError } from '../shared/errors';
@@ -56,17 +56,40 @@ export const AuthModel = {
       throw new UnauthorizedError('Credenciales inválidas');
     }
 
-    const valid = await comparePassword(data.password, user.password);
-    if (!valid) {
-      await LoginAttemptModel.log({ email: data.email, userId: user.id, success: false, ipAddress: data.ipAddress });
-      throw new UnauthorizedError('Credenciales inválidas');
+    // Account lockout check
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      const remaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      throw new AppError(429, `Cuenta bloqueada. Intenta de nuevo en ${remaining} minuto(s).`);
     }
-
-    await LoginAttemptModel.log({ email: data.email, userId: user.id, success: true, ipAddress: data.ipAddress });
 
     if (user.status === 'bloqueado') {
       throw new AppError(403, 'Tu cuenta está bloqueada. Contacta al administrador.');
     }
+
+    const valid = await comparePassword(data.password, user.password);
+    if (!valid) {
+      await LoginAttemptModel.log({ email: data.email, userId: user.id, success: false, ipAddress: data.ipAddress });
+
+      const attempts = user.loginAttempts + 1;
+      const updateData: any = { loginAttempts: attempts };
+      if (attempts >= 5) {
+        updateData.lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+      }
+      await prisma.user.update({ where: { id: user.id }, data: updateData });
+
+      const remaining = 5 - attempts;
+      if (remaining <= 0) {
+        throw new AppError(429, 'Demasiados intentos. Cuenta bloqueada por 15 minutos.');
+      }
+      throw new UnauthorizedError(`Credenciales inválidas. Te quedan ${remaining} intento(s).`);
+    }
+
+    // Reset login attempts on success
+    if (user.loginAttempts > 0 || user.lockedUntil) {
+      await prisma.user.update({ where: { id: user.id }, data: { loginAttempts: 0, lockedUntil: null } });
+    }
+
+    await LoginAttemptModel.log({ email: data.email, userId: user.id, success: true, ipAddress: data.ipAddress });
 
     if (user.twoFactorEnabled) {
       const partialToken = generatePartialToken({ userId: user.id, email: user.email, role: user.role, step: '2fa' });
@@ -94,14 +117,17 @@ export const AuthModel = {
       return { requires2FA: true, method: user.twoFactorMethod, partialToken, email: user.email };
     }
 
+    const payload = { userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
     await prisma.userSession.create({
-      data: { userId: user.id, token: '', isActive: true },
+      data: { userId: user.id, token: refreshToken, isActive: true },
     });
 
-    const token = generateToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName });
-
     return {
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id, email: user.email, firstName: user.firstName,
         lastName: user.lastName, phone: user.phone, company: user.company, role: user.role,
@@ -203,14 +229,17 @@ export const AuthModel = {
       });
     }
 
+    const tokenPayload = { userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName };
+    const accessToken = generateAccessToken(tokenPayload);
+    const refreshToken = generateRefreshToken(tokenPayload);
+
     await prisma.userSession.create({
-      data: { userId: user.id, token: '', isActive: true },
+      data: { userId: user.id, token: refreshToken, isActive: true },
     });
 
-    const token = generateToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName });
-
     return {
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id, email: user.email, firstName: user.firstName,
         lastName: user.lastName, phone: user.phone, company: user.company, role: user.role,
@@ -436,6 +465,60 @@ export const AuthModel = {
     });
 
     return { message: 'Contraseña actualizada correctamente' };
+  },
+
+  async refresh(refreshTokenStr: string) {
+    let payload: any;
+    try {
+      payload = verifyToken(refreshTokenStr);
+    } catch {
+      throw new UnauthorizedError('Sesión expirada. Inicia sesión nuevamente.');
+    }
+
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedError('Token de refresco inválido.');
+    }
+
+    // Verify it exists in DB (allows revocation)
+    const session = await prisma.userSession.findFirst({
+      where: { token: refreshTokenStr, isActive: true, userId: payload.userId },
+    });
+    if (!session) {
+      throw new UnauthorizedError('Sesión no encontrada. Inicia sesión nuevamente.');
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) throw new UnauthorizedError('Usuario no encontrado.');
+    if (user.status === 'bloqueado') {
+      throw new AppError(403, 'Tu cuenta está bloqueada. Contacta al administrador.');
+    }
+
+    // Rotate refresh token (revoke old, create new)
+    const newPayload = { userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName };
+    const newAccessToken = generateAccessToken(newPayload);
+    const newRefreshToken = generateRefreshToken(newPayload);
+
+    await prisma.userSession.update({
+      where: { id: session.id },
+      data: { token: newRefreshToken, lastActivity: new Date() },
+    });
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        id: user.id, email: user.email, firstName: user.firstName,
+        lastName: user.lastName, phone: user.phone, company: user.company, role: user.role,
+      },
+    };
+  },
+
+  async logout(refreshTokenStr?: string) {
+    if (!refreshTokenStr) return;
+    await prisma.userSession.updateMany({
+      where: { token: refreshTokenStr, isActive: true },
+      data: { isActive: false },
+    });
   },
 
   async getUserById(id: number) {
