@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY backend/package.json backend/package-lock.json backend/prisma/ ./
-RUN npm ci
+RUN npm install
 COPY backend/ .
 RUN npx prisma generate && npm run build
 
