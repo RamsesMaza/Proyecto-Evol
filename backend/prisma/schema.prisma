@@ -370,7 +370,7 @@ model UserSession {
   id           Int      @id @default(autoincrement())
   userId       Int
   user         User     @relation(fields: [userId], references: [id])
-  token        String
+  token        String   @db.VarChar(2048)
   ipAddress    String?
   userAgent    String?
   isActive     Boolean  @default(true)
