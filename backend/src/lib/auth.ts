@@ -78,16 +78,14 @@ export const generateBackupCodes = (count = 8): string[] => {
 };
 
 export const verifyRecaptcha = async (token?: string | null): Promise<boolean> => {
-  const isProd = process.env.NODE_ENV === 'production';
-
   if (!RECAPTCHA_SECRET) {
     logger.warn('RECAPTCHA_SECRET_KEY no configurada. Saltando validación.');
-    return !isProd;
+    return true;
   }
 
   if (!token) {
-    logger.warn('reCAPTCHA token no proporcionado.');
-    return !isProd;
+    logger.warn('reCAPTCHA token no proporcionado. Saltando validación.');
+    return true;
   }
 
   try {
