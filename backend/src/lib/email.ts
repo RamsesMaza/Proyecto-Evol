@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { logger } from './logger';
 
 const smtpConfigured = !!(
   process.env.SMTP_USER &&
@@ -102,40 +103,53 @@ function build2faHtml(code: string): string {
 </html>`;
 }
 
-export const sendOtpEmail = async (to: string, code: string): Promise<void> => {
+async function trySend(mailOptions: nodemailer.SendMailOptions, fallback: () => void): Promise<void> {
   if (!smtpConfigured || !transporter) {
-    console.log(`\n===========================================`);
-    console.log(`[DEV] Email a: ${to}`);
-    console.log(`[DEV] Tu código de recuperación es: ${code}`);
-    console.log(`[DEV] SMTP no configurado. Define SMTP_USER y SMTP_PASS en .env para enviar correos reales.`);
-    console.log(`===========================================\n`);
+    fallback();
     return;
   }
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    logger.error({ err }, 'Error enviando correo. Mostrando código en consola.');
+    fallback();
+  }
+}
 
-  await transporter.sendMail({
-    from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-    to,
-    subject: 'Código de recuperación de contraseña',
-    html: buildHtml(code),
-  });
+export const sendOtpEmail = async (to: string, code: string): Promise<void> => {
+  await trySend(
+    {
+      from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to,
+      subject: 'Código de recuperación de contraseña',
+      html: buildHtml(code),
+    },
+    () => {
+      console.log(`\n===========================================`);
+      console.log(`[DEV] Email a: ${to}`);
+      console.log(`[DEV] Tu código de recuperación es: ${code}`);
+      console.log(`[DEV] SMTP no disponible, código mostrado en consola.`);
+      console.log(`===========================================\n`);
+    },
+  );
 };
 
 export const send2faOtpEmail = async (to: string, code: string): Promise<void> => {
-  if (!smtpConfigured || !transporter) {
-    console.log(`\n===========================================`);
-    console.log(`[DEV] 2FA Email a: ${to}`);
-    console.log(`[DEV] Tu código 2FA es: ${code}`);
-    console.log(`[DEV] SMTP no configurado. Define SMTP_USER y SMTP_PASS en .env para enviar correos reales.`);
-    console.log(`===========================================\n`);
-    return;
-  }
-
-  await transporter.sendMail({
-    from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-    to,
-    subject: 'Código de verificación - Autenticación de Dos Factores',
-    html: build2faHtml(code),
-  });
+  await trySend(
+    {
+      from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to,
+      subject: 'Código de verificación - Autenticación de Dos Factores',
+      html: build2faHtml(code),
+    },
+    () => {
+      console.log(`\n===========================================`);
+      console.log(`[DEV] 2FA Email a: ${to}`);
+      console.log(`[DEV] Tu código 2FA es: ${code}`);
+      console.log(`[DEV] SMTP no disponible, código mostrado en consola.`);
+      console.log(`===========================================\n`);
+    },
+  );
 };
 
 export const sendInvoiceEmail = async (
