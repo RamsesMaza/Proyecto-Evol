@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import styles from "./hero.module.scss";
+import styles from "./Hero.module.scss";
 
 import slide1 from "../../../assets/img/hero1.webp";
 import slide2 from "../../../assets/img/hero2.webp";
