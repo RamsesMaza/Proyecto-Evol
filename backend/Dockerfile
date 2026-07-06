@@ -1,3 +1,10 @@
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY front/package.json front/package-lock.json ./
+RUN npm install
+COPY front/ .
+RUN npx vite build
+
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY backend/package.json backend/package-lock.json backend/prisma/ ./
@@ -12,6 +19,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=frontend-builder /app/dist /front/dist
 EXPOSE 3000
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "dist/index.js"]
