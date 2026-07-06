@@ -22,4 +22,4 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=frontend-builder /app/dist /front/dist
 EXPOSE 3000
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/index.js"]
