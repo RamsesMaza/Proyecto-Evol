@@ -84,17 +84,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Debug — list key packages
-        run: npx vitest --version && ls node_modules/@testing-library/jest-dom/dist/ 2>&1 | head -5
-
       - name: TypeScript check
         run: npx tsc --noEmit
 
       - name: Run tests
-        run: npm test -- --reporter verbose 2>&1
+        run: npm test -- --reporter verbose
 
       - name: Build
-        run: npm run build 2>&1
+        run: npx vite build
 
   docker:
     name: Build & Push Docker Images
