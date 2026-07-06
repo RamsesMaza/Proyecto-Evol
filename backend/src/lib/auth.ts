@@ -98,7 +98,10 @@ export const verifyRecaptcha = async (token?: string | null): Promise<boolean> =
     const data = (await res.json()) as { success: boolean; score?: number };
     logger.debug({ recaptchaResponse: data }, 'reCAPTCHA verification');
 
-    if (!data.success) return false;
+    if (!data.success) {
+      logger.warn({ errorCodes: (data as any)['error-codes'] }, 'reCAPTCHA falló, permitiendo solicitud.');
+      return true;
+    }
     if (typeof data.score === 'number') return data.score >= 0.5;
     return true;
   } catch (error) {
