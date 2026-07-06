@@ -52,6 +52,11 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
+      - name: Push DB schema
+        run: npx prisma db push --accept-data-loss
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mysql://root:root@127.0.0.1:3306/pro_evol' }}
+
       - name: Run tests
         run: npm test -- --reporter verbose
         env:
