@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -149,6 +150,26 @@ async function main() {
     });
   }
   console.log('Products seeded');
+
+  // Seed test users with different roles
+  const passwordHash = await bcrypt.hash('Test1234!', 10);
+  const testUsers = [
+    { email: 'admin@acs.com', role: 'ADMIN', firstName: 'Admin', lastName: 'ACS', phone: '+51 999000001', company: 'ACS Perú', status: 'activo' },
+    { email: 'user@acs.com', role: 'USER', firstName: 'Usuario', lastName: 'ACS', phone: '+51 999000002', company: 'ACS Perú', status: 'activo' },
+    { email: 'sales@acs.com', role: 'SALES', firstName: 'Ventas', lastName: 'ACS', phone: '+51 999000003', company: 'ACS Perú', status: 'activo' },
+    { email: 'ti@acs.com', role: 'TI', firstName: 'Soporte', lastName: 'TI', phone: '+51 999000004', company: 'ACS Perú', status: 'activo' },
+    { email: 'marketing@acs.com', role: 'MARKETING', firstName: 'Marketing', lastName: 'ACS', phone: '+51 999000005', company: 'ACS Perú', status: 'activo' },
+    { email: 'auditor@acs.com', role: 'AUDITOR', firstName: 'Auditor', lastName: 'ACS', phone: '+51 999000006', company: 'ACS Perú', status: 'activo' },
+  ];
+
+  for (const u of testUsers) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: {},
+      create: { ...u, password: passwordHash },
+    });
+  }
+  console.log('Test users seeded');
 }
 
 main()
