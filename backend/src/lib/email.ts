@@ -1,27 +1,17 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { logger } from './logger';
 
-const smtpConfigured = !!(
-  process.env.SMTP_USER &&
-  process.env.SMTP_PASS &&
-  !process.env.SMTP_USER.startsWith('tu_')
+const sendgridConfigured = !!(
+  process.env.SENDGRID_API_KEY &&
+  !process.env.SENDGRID_API_KEY.startsWith('tu_')
 );
 
-let transporter: nodemailer.Transporter | null = null;
-
-if (smtpConfigured) {
-  transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+if (sendgridConfigured) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 }
 
 const appName = 'American Certification Service';
+const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@acsperu.com';
 
 function buildHtml(code: string): string {
   return `
@@ -103,74 +93,8 @@ function build2faHtml(code: string): string {
 </html>`;
 }
 
-async function trySend(mailOptions: nodemailer.SendMailOptions, fallback: () => void): Promise<void> {
-  if (!smtpConfigured || !transporter) {
-    fallback();
-    return;
-  }
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (err) {
-    logger.error({ err }, 'Error enviando correo. Mostrando código en consola.');
-    fallback();
-  }
-}
-
-export const sendOtpEmail = async (to: string, code: string): Promise<void> => {
-  await trySend(
-    {
-      from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-      to,
-      subject: 'Código de recuperación de contraseña',
-      html: buildHtml(code),
-    },
-    () => {
-      console.log(`\n===========================================`);
-      console.log(`[DEV] Email a: ${to}`);
-      console.log(`[DEV] Tu código de recuperación es: ${code}`);
-      console.log(`[DEV] SMTP no disponible, código mostrado en consola.`);
-      console.log(`===========================================\n`);
-    },
-  );
-};
-
-export const send2faOtpEmail = async (to: string, code: string): Promise<void> => {
-  await trySend(
-    {
-      from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-      to,
-      subject: 'Código de verificación - Autenticación de Dos Factores',
-      html: build2faHtml(code),
-    },
-    () => {
-      console.log(`\n===========================================`);
-      console.log(`[DEV] 2FA Email a: ${to}`);
-      console.log(`[DEV] Tu código 2FA es: ${code}`);
-      console.log(`[DEV] SMTP no disponible, código mostrado en consola.`);
-      console.log(`===========================================\n`);
-    },
-  );
-};
-
-export const sendInvoiceEmail = async (
-  to: string,
-  pdfBuffer: Buffer,
-  orderId: number,
-): Promise<void> => {
-  if (!smtpConfigured || !transporter) {
-    console.log(`\n===========================================`);
-    console.log(`[DEV] Factura enviada a: ${to}`);
-    console.log(`[DEV] Orden #${orderId} - PDF generado (${(pdfBuffer.length / 1024).toFixed(1)} KB)`);
-    console.log(`[DEV] SMTP no configurado. El PDF se guardó en memoria.`);
-    console.log(`===========================================\n`);
-    return;
-  }
-
-  await transporter.sendMail({
-    from: `"${appName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-    to,
-    subject: `Recibo de compra - Orden #${orderId}`,
-    html: `
+function buildInvoiceHtml(orderId: number): string {
+  return `
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><style>
@@ -198,13 +122,69 @@ export const sendInvoiceEmail = async (
     </div>
   </div>
 </body>
-</html>`,
-    attachments: [
-      {
-        filename: `recibo-${orderId}.pdf`,
-        content: pdfBuffer,
-        contentType: 'application/pdf',
-      },
-    ],
-  });
+</html>`;
+}
+
+async function trySend(
+  to: string,
+  subject: string,
+  html: string,
+  attachment?: { filename: string; content: Buffer; contentType: string },
+): Promise<void> {
+  if (!sendgridConfigured) {
+    console.log(`\n===========================================`);
+    console.log(`[DEV] Email a: ${to}`);
+    console.log(`[DEV] Asunto: ${subject}`);
+    console.log(`[DEV] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
+    console.log(`[DEV] SendGrid no configurado — código mostrado en consola.`);
+    console.log(`===========================================\n`);
+    return;
+  }
+
+  try {
+    const msg: any = { to, from: fromEmail, subject, html };
+    if (attachment) {
+      msg.attachments = [{
+        filename: attachment.filename,
+        content: attachment.content.toString('base64'),
+        type: attachment.contentType,
+        disposition: 'attachment',
+      }];
+    }
+    await sgMail.send(msg);
+    logger.info({ to, subject }, 'Correo enviado exitosamente vía SendGrid');
+  } catch (err) {
+    logger.error({ err, to, subject }, 'Error enviando correo vía SendGrid');
+    console.log(`\n===========================================`);
+    console.log(`[FALLBACK] Email a: ${to}`);
+    console.log(`[FALLBACK] Asunto: ${subject}`);
+    console.log(`[FALLBACK] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
+    console.log(`[FALLBACK] SendGrid falló — código mostrado en consola.`);
+    console.log(`===========================================\n`);
+  }
+}
+
+export const sendOtpEmail = async (to: string, code: string): Promise<void> => {
+  await trySend(to, 'Código de recuperación de contraseña', buildHtml(code));
+};
+
+export const send2faOtpEmail = async (to: string, code: string): Promise<void> => {
+  await trySend(to, 'Código de verificación - Autenticación de Dos Factores', build2faHtml(code));
+};
+
+export const sendInvoiceEmail = async (
+  to: string,
+  pdfBuffer: Buffer,
+  orderId: number,
+): Promise<void> => {
+  await trySend(
+    to,
+    `Recibo de compra - Orden #${orderId}`,
+    buildInvoiceHtml(orderId),
+    {
+      filename: `recibo-${orderId}.pdf`,
+      content: pdfBuffer,
+      contentType: 'application/pdf',
+    },
+  );
 };
