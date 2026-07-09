@@ -7,7 +7,7 @@ const resendConfigured = !!(resendApiKey && !resendApiKey.startsWith('tu_'));
 const resend = resendConfigured ? new Resend(resendApiKey!) : null;
 
 const appName = 'American Certification Service';
-const fromEmail = process.env.RESEND_FROM || 'noreply@acsperu.com';
+const fromEmail = process.env.RESEND_FROM || 'onboarding@resend.dev';
 
 function buildHtml(code: string): string {
   return `
@@ -121,19 +121,30 @@ function buildInvoiceHtml(orderId: number): string {
 </html>`;
 }
 
+function extractCode(html: string): string {
+  return html.match(/\d{6}/)?.[0] || '(sin código visible)';
+}
+
+function logToConsole(to: string, subject: string, code: string, prefix: string): void {
+  console.log(`\n===========================================`);
+  console.log(`[${prefix}] Email a: ${to}`);
+  console.log(`[${prefix}] Asunto: ${subject}`);
+  console.log(`[${prefix}] Código: ${code}`);
+  console.log(`===========================================\n`);
+}
+
 async function trySend(
   to: string,
   subject: string,
   html: string,
   attachment?: { filename: string; content: Buffer; contentType: string },
 ): Promise<void> {
+  const code = extractCode(html);
+
+  // Always log to console so the code is visible in Railway logs
+  logToConsole(to, subject, code, resendConfigured ? 'RESEND' : 'DEV');
+
   if (!resendConfigured || !resend) {
-    console.log(`\n===========================================`);
-    console.log(`[DEV] Email a: ${to}`);
-    console.log(`[DEV] Asunto: ${subject}`);
-    console.log(`[DEV] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
-    console.log(`[DEV] Resend no configurado — código mostrado en consola.`);
-    console.log(`===========================================\n`);
     return;
   }
 
@@ -156,12 +167,6 @@ async function trySend(
     logger.info({ to, subject }, 'Correo enviado exitosamente vía Resend');
   } catch (err) {
     logger.error({ err, to, subject }, 'Error enviando correo vía Resend');
-    console.log(`\n===========================================`);
-    console.log(`[FALLBACK] Email a: ${to}`);
-    console.log(`[FALLBACK] Asunto: ${subject}`);
-    console.log(`[FALLBACK] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
-    console.log(`[FALLBACK] Resend falló — código mostrado en consola.`);
-    console.log(`===========================================\n`);
   }
 }
 
