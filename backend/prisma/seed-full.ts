@@ -235,11 +235,41 @@ async function main() {
   const tiUsers = allUsers.filter(u => u.role === 'TI');
   console.log(`Total users: ${allUsers.length} (${regularUsers.length} regular, ${salesUsers.length} sales, ${marketingUsers.length} marketing, ${tiUsers.length} TI)`);
 
-  // ── 4. Generate Orders (300-500) over 12 months ─────────────────────────────
+  // ── 4. Clear data from previous runs (reverse FK order) ────────────────────
+  console.log('\n🧹 Clearing existing seed data...');
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.cotizacionActividad.deleteMany({});
+  await prisma.cotizacionItem.deleteMany({});
+  await prisma.cotizacion.deleteMany({});
+  await prisma.leadActivity.deleteMany({});
+  await prisma.lead.deleteMany({});
+  await prisma.campaignResult.deleteMany({});
+  await prisma.emailCampaign.deleteMany({});
+  await prisma.smsCampaign.deleteMany({});
+  await prisma.campaign.deleteMany({});
+  await prisma.supportTicket.deleteMany({});
+  await prisma.review.deleteMany({});
+  await prisma.notification.deleteMany({});
+  await prisma.loginAttempt.deleteMany({});
+  await prisma.userSession.deleteMany({});
+  await prisma.auditLog.deleteMany({});
+  await prisma.certificate.deleteMany({});
+  await prisma.courseEnrollment.deleteMany({});
+  await prisma.courseMaterial.deleteMany({});
+  await prisma.courseModule.deleteMany({});
+  await prisma.course.deleteMany({});
+  await prisma.message.deleteMany({});
+  await prisma.segmentMember.deleteMany({});
+  await prisma.segment.deleteMany({});
+  await prisma.rolePermission.deleteMany({});
+  await prisma.permission.deleteMany({});
+  console.log('Cleared existing seed data');
+
+  // ── 5. Generate Orders (300-500) over 12 months ─────────────────────────────
   console.log('\n📋 Generating orders...');
+
   const numOrders = randomInt(350, 500);
-  const ordersData: any[] = [];
-  const orderItemsData: any[] = [];
 
   for (let i = 0; i < numOrders; i++) {
     const user = randomItem(allUsers);
@@ -271,44 +301,29 @@ async function main() {
     const discount = randomBool(0.2) ? parseFloat((subtotal * randomFloat(0.05, 0.15)).toFixed(2)) : 0;
     const total = parseFloat((subtotal + tax + shipping - discount).toFixed(2));
 
-    const orderId = i + 1;
-    ordersData.push({
-      id: orderId,
-      userId: user.id,
-      customerName: `${user.firstName} ${user.lastName}`,
-      customerEmail: user.email,
-      customerPhone: user.phone,
-      customerAddress: `${randomInt(100, 9999)} Av. ${randomItem(['Principal','Los Olivos','Industrial','Central','Norte','Sur','Este','Oeste'])}`,
-      customerCity: addr.city,
-      customerZip: zip,
-      shippingMethod: randomItem(['delivery','delivery','delivery','pickup']),
-      paymentMethod,
-      paymentStatus,
-      status,
-      subtotal,
-      tax,
-      shipping,
-      discount,
-      total,
-      notes: randomBool(0.15) ? 'Cliente solicitó factura electrónica' : null,
-      createdAt,
+    await prisma.order.create({
+      data: {
+        userId: user.id,
+        customerName: `${user.firstName} ${user.lastName}`,
+        customerEmail: user.email,
+        customerPhone: user.phone,
+        customerAddress: `${randomInt(100, 9999)} Av. ${randomItem(['Principal','Los Olivos','Industrial','Central','Norte','Sur','Este','Oeste'])}`,
+        customerCity: addr.city,
+        customerZip: zip,
+        shippingMethod: randomItem(['delivery','delivery','delivery','pickup']),
+        paymentMethod, paymentStatus, status,
+        subtotal, tax, shipping, discount, total,
+        notes: randomBool(0.15) ? 'Cliente solicitó factura electrónica' : null,
+        createdAt,
+        items: { create: items },
+      },
     });
-    orderItemsData.push(...items.map(it => ({ ...it, orderId })));
-  }
 
-  // Batch insert orders
-  const BATCH = 50;
-  for (let i = 0; i < ordersData.length; i += BATCH) {
-    await prisma.order.createMany({ data: ordersData.slice(i, i + BATCH) });
+    if ((i + 1) % 100 === 0) console.log(`  ${i + 1} orders created...`);
   }
-  console.log(`Created ${ordersData.length} orders`);
+  console.log(`Created ${numOrders} orders`);
 
-  for (let i = 0; i < orderItemsData.length; i += BATCH) {
-    await prisma.orderItem.createMany({ data: orderItemsData.slice(i, i + BATCH) });
-  }
-  console.log(`Created ${orderItemsData.length} order items`);
-
-  // ── 5. Generate Cotizaciones (200-300) ──────────────────────────────────────
+  // ── 6. Generate Cotizaciones (200-300) ──────────────────────────────────────
   console.log('\n📄 Generating cotizaciones...');
   const numCots = randomInt(200, 300);
   const usedCodigos = new Set<string>();
@@ -380,7 +395,7 @@ async function main() {
   }
   console.log(`Created ${numCots} cotizaciones`);
 
-  // ── 6. Generate Campaigns (20-30) ───────────────────────────────────────────
+  // ── 7. Generate Campaigns (20-30) ───────────────────────────────────────────
   console.log('\n📢 Generating campaigns...');
   const numCampaigns = randomInt(20, 30);
   const campaignNames = [
@@ -481,7 +496,7 @@ async function main() {
   }
   console.log(`Created ${numCampaigns} campaigns with results`);
 
-  // ── 7. Generate Leads (300-500) with activities ─────────────────────────────
+  // ── 8. Generate Leads (300-500) with activities ─────────────────────────────
   console.log('\n🎯 Generating leads...');
   const campaigns = await prisma.campaign.findMany();
   const numLeads = randomInt(300, 500);
@@ -547,7 +562,7 @@ async function main() {
   }
   console.log(`Created ${numLeads} leads with activities`);
 
-  // ── 8. Generate Support Tickets (50-100) ─────────────────────────────────────
+  // ── 9. Generate Support Tickets (50-100) ─────────────────────────────────────
   console.log('\n🎫 Generating support tickets...');
   const numTickets = randomInt(50, 100);
   for (let i = 0; i < numTickets; i++) {
@@ -579,7 +594,7 @@ async function main() {
   }
   console.log(`Created ${numTickets} support tickets`);
 
-  // ── 9. Generate Reviews (50-100) ────────────────────────────────────────────
+  // ── 10. Generate Reviews (50-100) ───────────────────────────────────────────
   console.log('\n⭐ Generating reviews...');
   const numReviews = randomInt(50, 100);
   const reviewComments = [
@@ -604,7 +619,7 @@ async function main() {
   }
   console.log(`Created ${numReviews} reviews`);
 
-  // ── 10. Generate Notifications (200+) ────────────────────────────────────────
+  // ── 11. Generate Notifications (200+) ────────────────────────────────────────
   console.log('\n🔔 Generating notifications...');
   const notificationTypes = ['info','info','success','warning','system','message','promo'];
   const notificationTemplates = [
@@ -640,7 +655,7 @@ async function main() {
   }
   console.log(`Created ${numNotifications} notifications`);
 
-  // ── 11. Generate LoginAttempts (500+) ────────────────────────────────────────
+  // ── 12. Generate LoginAttempts (500+) ────────────────────────────────────────
   console.log('\n🔐 Generating login attempts...');
   const numLoginAttempts = randomInt(500, 800);
   const loginBatch: any[] = [];
@@ -662,7 +677,7 @@ async function main() {
   if (loginBatch.length > 0) await prisma.loginAttempt.createMany({ data: loginBatch });
   console.log(`Created ${numLoginAttempts} login attempts`);
 
-  // ── 12. Generate UserSessions ────────────────────────────────────────────────
+  // ── 13. Generate UserSessions ────────────────────────────────────────────────
   console.log('\n💻 Generating user sessions...');
   const numSessions = randomInt(100, 200);
   const sessionBatch: any[] = [];
@@ -693,7 +708,7 @@ async function main() {
   if (sessionBatch.length > 0) await prisma.userSession.createMany({ data: sessionBatch });
   console.log(`Created ${numSessions} sessions`);
 
-  // ── 13. Generate AuditLogs (300+) ────────────────────────────────────────────
+  // ── 14. Generate AuditLogs (300+) ────────────────────────────────────────────
   console.log('\n📝 Generating audit logs...');
   const auditActions = [
     { action: 'login', entity: 'User' },
@@ -736,7 +751,7 @@ async function main() {
   }
   console.log(`Created ${numAuditLogs} audit logs`);
 
-  // ── 14. Generate Certificates (30-60) ────────────────────────────────────────
+  // ── 15. Generate Certificates (30-60) ────────────────────────────────────────
   console.log('\n🏅 Generating certificates...');
   const numCerts = randomInt(30, 60);
   const certTitles = [
@@ -768,7 +783,7 @@ async function main() {
   }
   console.log(`Created ${numCerts} certificates`);
 
-  // ── 15. Generate Courses (10-20) with modules and materials ──────────────────
+  // ── 16. Generate Courses (10-20) with modules and materials ──────────────────
   console.log('\n📚 Generating courses...');
   const courseData = [
     { title: 'Implementación ISO 9001:2025', category: 'Calidad', level: 'intermedio' as const, duration: 24 },
@@ -842,7 +857,7 @@ async function main() {
   }
   console.log(`Created ${courseData.length} courses with modules, materials, and enrollments`);
 
-  // ── 16. Generate Messages (200-400) ──────────────────────────────────────────
+  // ── 17. Generate Messages (200-400) ──────────────────────────────────────────
   console.log('\n✉️ Generating messages...');
   const numMessages = randomInt(200, 400);
   const messageSubjects = [
@@ -879,7 +894,7 @@ async function main() {
   }
   console.log(`Created ${numMessages} messages`);
 
-  // ── 17. Generate Segments with members ───────────────────────────────────────
+  // ── 18. Generate Segments with members ───────────────────────────────────────
   console.log('\n📊 Generating segments...');
   const segmentData = [
     { name: 'Clientes Premium', description: 'Usuarios con múltiples certificaciones', criteria: 'more_than_2_certificates' },
@@ -916,7 +931,7 @@ async function main() {
   }
   console.log(`Created ${segmentData.length} segments with members`);
 
-  // ── 18. Generate SystemSettings ──────────────────────────────────────────────
+  // ── 19. Generate SystemSettings ──────────────────────────────────────────────
   console.log('\n⚙️ Generating system settings...');
   const settings = [
     { key: 'company_name', value: 'ACS Perú' },
@@ -949,7 +964,7 @@ async function main() {
   }
   console.log(`Configured ${settings.length} system settings`);
 
-  // ── 19. Update product specs and images ──────────────────────────────────────
+  // ── 20. Update product specs and images ──────────────────────────────────────
   console.log('\n🖼️ Generating product specs and images...');
   for (const prod of products) {
     // ProductImages
