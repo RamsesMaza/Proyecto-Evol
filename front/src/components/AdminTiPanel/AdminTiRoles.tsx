@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FaUserShield, FaSyncAlt, FaPlus, FaCheck, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { FaUserShield, FaSyncAlt, FaPlus, FaCheck, FaTimes, FaCheckDouble, FaBan } from 'react-icons/fa';
 import { fetchPermissions, fetchRolePermissions, assignPermission, removePermission, createPermission, type Permission } from '../../services/adminTiApi';
 import styles from './AdminTiRoles.module.scss';
 
@@ -61,6 +61,38 @@ const AdminTiRoles = () => {
   };
 
   const modules = [...new Set(permissions.map(p => p.module))];
+  const assignedCount = rolePerms[activeRole]?.length ?? 0;
+  const totalCount = permissions.length;
+
+  const modulePerms = useMemo(() => {
+    const m: Record<string, number[]> = {};
+    permissions.forEach(p => {
+      if (!m[p.module]) m[p.module] = [];
+      m[p.module].push(p.id);
+    });
+    return m;
+  }, [permissions]);
+
+  const toggleModule = async (module: string) => {
+    const permIds = modulePerms[module] || [];
+    const assigned = rolePerms[activeRole] || [];
+    const allAssigned = permIds.every(id => assigned.includes(id));
+    try {
+      if (allAssigned) {
+        for (const id of permIds) {
+          if (assigned.includes(id)) await removePermission(activeRole, id);
+        }
+        setRolePerms(p => ({ ...p, [activeRole]: (p[activeRole] || []).filter(id => !permIds.includes(id)) }));
+        setActionMsg(`Permisos de "${module}" removidos`);
+      } else {
+        for (const id of permIds) {
+          if (!assigned.includes(id)) await assignPermission(activeRole, id);
+        }
+        setRolePerms(p => ({ ...p, [activeRole]: [...new Set([...(p[activeRole] || []), ...permIds])] }));
+        setActionMsg(`Permisos de "${module}" asignados`);
+      }
+    } catch (e: any) { setActionMsg(e.message); }
+  };
 
   return (
     <div className={styles.module}>
@@ -86,21 +118,35 @@ const AdminTiRoles = () => {
         ))}
       </div>
 
+      <div className={styles.summaryRow}>
+        <span className={styles.summaryText}>
+          <FaCheck /> {assignedCount} de {totalCount} permisos asignados a <strong>{activeRole}</strong>
+        </span>
+      </div>
+
       <div className={styles.card}>
         {loading ? <div className={styles.loading}>Cargando permisos...</div> : (
           <table className={styles.table}>
             <thead><tr>
-              <th>Permiso</th><th>Slug</th><th>Módulo</th><th className={styles.thCenter}>Asignado</th>
+              <th>Permiso</th><th>Slug</th><th className={styles.thCenter}>Asignado</th>
             </tr></thead>
             <tbody>
               {modules.map(mod => (
                 <React.Fragment key={mod}>
-                  <tr className={styles.moduleRow}><td colSpan={4} className={styles.moduleLabel}>{mod}</td></tr>
+                  <tr className={styles.moduleRow}>
+                    <td colSpan={3} className={styles.moduleLabel}>
+                      <span>{mod}</span>
+                      <button className={styles.moduleToggle} onClick={() => toggleModule(mod)} title="Alternar todos">
+                        {(modulePerms[mod] || []).every(id => (rolePerms[activeRole] || []).includes(id))
+                          ? <><FaBan /> Quitar</>
+                          : <><FaCheckDouble /> Asignar</>}
+                      </button>
+                    </td>
+                  </tr>
                   {permissions.filter(p => p.module === mod).map(p => (
                     <tr key={p.id} className={styles.tr}>
                       <td><span className={styles.permName}>{p.name}</span><span className={styles.permDesc}>{p.description}</span></td>
                       <td><code className={styles.slug}>{p.slug}</code></td>
-                      <td><span className={styles.moduleBadge}>{p.module}</span></td>
                       <td className={styles.tdCenter}>
                         <button className={`${styles.toggle} ${rolePerms[activeRole]?.includes(p.id) ? styles.toggleOn : styles.toggleOff}`}
                           onClick={() => togglePermission(p.id)}>

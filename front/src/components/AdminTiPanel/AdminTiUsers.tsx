@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { FaUsers, FaSearch, FaSyncAlt, FaUserPlus, FaEdit, FaCheck, FaBan, FaLock, FaUnlock, FaKey, FaHistory, FaSignInAlt, FaChevronLeft, FaChevronRight, FaUserCheck, FaEye, FaTrashAlt, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { FaUsers, FaSearch, FaSyncAlt, FaUserPlus, FaEdit, FaCheck, FaBan, FaLock, FaUnlock, FaKey, FaHistory, FaSignInAlt, FaChevronLeft, FaChevronRight, FaUserCheck, FaEye, FaTrashAlt, FaSpinner, FaExclamationTriangle, FaUserShield, FaUserCog, FaUserTag, FaIdBadge, FaUserTie } from 'react-icons/fa';
 import { fetchTiUsers, createTiUser, updateTiUser, changeUserStatus, changeUserRole, resetUserPassword, fetchUserActivity, fetchUserLoginHistory, deleteTiUser, type TiUser } from '../../services/adminTiApi';
 import styles from './AdminTiUsers.module.scss';
 
@@ -24,6 +24,14 @@ const AdminTiUsers = () => {
   const [actionMsg, setActionMsg] = useState('');
 
   const PAGE_SIZE = 10;
+
+  const stats = useMemo(() => {
+    const activos = users.filter(u => u.status === 'activo').length;
+    const admins = users.filter(u => u.role === 'ADMIN').length;
+    const salesUsers = users.filter(u => u.role === 'SALES').length;
+    const tiUsers = users.filter(u => u.role === 'TI').length;
+    return { activos, admins, sales: salesUsers, ti: tiUsers };
+  }, [users]);
 
   const load = useCallback(async () => {
     try { setLoading(true); setActionMsg('');
@@ -135,6 +143,14 @@ const AdminTiUsers = () => {
       </div>
 
       {actionMsg && <div className={styles.toast}><FaExclamationTriangle /> {actionMsg}</div>}
+
+      <div className={styles.statsRow}>
+        <div className={styles.statCard}><FaUsers className={styles.statIconSm} /><div><span className={styles.statNumSm}>{total}</span><span className={styles.statLabelSm}>Total</span></div></div>
+        <div className={styles.statCard}><FaUserCheck className={styles.statIconSm} /><div><span className={styles.statNumSm}>{stats.activos}</span><span className={styles.statLabelSm}>Activos</span></div></div>
+        <div className={styles.statCard}><FaUserShield className={styles.statIconSm} /><div><span className={styles.statNumSm}>{stats.admins}</span><span className={styles.statLabelSm}>Admin</span></div></div>
+        <div className={styles.statCard}><FaUserTag className={styles.statIconSm} /><div><span className={styles.statNumSm}>{stats.sales}</span><span className={styles.statLabelSm}>Sales</span></div></div>
+        <div className={styles.statCard}><FaUserCog className={styles.statIconSm} /><div><span className={styles.statNumSm}>{stats.ti}</span><span className={styles.statLabelSm}>TI</span></div></div>
+      </div>
 
       <div className={styles.filterBar}>
         <div className={styles.searchWrap}>
