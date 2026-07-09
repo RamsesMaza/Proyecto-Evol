@@ -14,17 +14,19 @@ function parseCliente(c: any): Cliente {
 }
 
 export async function fetchClientes(params: {
-  search?: string; tag?: string; orderBy?: string; dir?: string;
-  page?: number; pageSize?: number; filter?: FilterPreset;
+  search?: string; query?: string; tag?: string; orderBy?: string; dir?: string;
+  page?: number; pageSize?: number; filter?: FilterPreset; status?: string;
 }): Promise<{ clientes: Cliente[]; total: number; page: number; pageSize: number; stats: ClienteStats }> {
   const sp = new URLSearchParams();
   if (params.search) sp.set('search', params.search);
+  if (params.query && !params.search) sp.set('query', params.query);
   if (params.tag) sp.set('tag', params.tag);
   if (params.orderBy) sp.set('orderBy', params.orderBy);
   if (params.dir) sp.set('dir', params.dir);
   if (params.page !== undefined) sp.set('page', String(params.page));
   if (params.pageSize !== undefined) sp.set('pageSize', String(params.pageSize));
   if (params.filter) sp.set('filter', params.filter);
+  if (params.status && !params.filter) sp.set('status', params.status);
   const data: any = await http(BASE, `?${sp.toString()}`);
   return { ...data, clientes: (data.clientes || []).map(parseCliente) };
 }
