@@ -1,17 +1,13 @@
-import sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 import { logger } from './logger';
 
-const sendgridConfigured = !!(
-  process.env.SENDGRID_API_KEY &&
-  !process.env.SENDGRID_API_KEY.startsWith('tu_')
-);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resendConfigured = !!(resendApiKey && !resendApiKey.startsWith('tu_'));
 
-if (sendgridConfigured) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-}
+const resend = resendConfigured ? new Resend(resendApiKey!) : null;
 
 const appName = 'American Certification Service';
-const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@acsperu.com';
+const fromEmail = process.env.RESEND_FROM || 'noreply@acsperu.com';
 
 function buildHtml(code: string): string {
   return `
@@ -131,35 +127,40 @@ async function trySend(
   html: string,
   attachment?: { filename: string; content: Buffer; contentType: string },
 ): Promise<void> {
-  if (!sendgridConfigured) {
+  if (!resendConfigured || !resend) {
     console.log(`\n===========================================`);
     console.log(`[DEV] Email a: ${to}`);
     console.log(`[DEV] Asunto: ${subject}`);
     console.log(`[DEV] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
-    console.log(`[DEV] SendGrid no configurado — código mostrado en consola.`);
+    console.log(`[DEV] Resend no configurado — código mostrado en consola.`);
     console.log(`===========================================\n`);
     return;
   }
 
   try {
-    const msg: any = { to, from: fromEmail, subject, html };
+    const payload: any = {
+      from: fromEmail,
+      to,
+      subject,
+      html,
+    };
     if (attachment) {
-      msg.attachments = [{
-        filename: attachment.filename,
-        content: attachment.content.toString('base64'),
-        type: attachment.contentType,
-        disposition: 'attachment',
-      }];
+      payload.attachments = [
+        {
+          filename: attachment.filename,
+          content: attachment.content.toString('base64'),
+        },
+      ];
     }
-    await sgMail.send(msg);
-    logger.info({ to, subject }, 'Correo enviado exitosamente vía SendGrid');
+    await resend.emails.send(payload);
+    logger.info({ to, subject }, 'Correo enviado exitosamente vía Resend');
   } catch (err) {
-    logger.error({ err, to, subject }, 'Error enviando correo vía SendGrid');
+    logger.error({ err, to, subject }, 'Error enviando correo vía Resend');
     console.log(`\n===========================================`);
     console.log(`[FALLBACK] Email a: ${to}`);
     console.log(`[FALLBACK] Asunto: ${subject}`);
     console.log(`[FALLBACK] Código: ${html.match(/\d{6}/)?.[0] || '(sin código visible)'}`);
-    console.log(`[FALLBACK] SendGrid falló — código mostrado en consola.`);
+    console.log(`[FALLBACK] Resend falló — código mostrado en consola.`);
     console.log(`===========================================\n`);
   }
 }
