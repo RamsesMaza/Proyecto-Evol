@@ -4,7 +4,7 @@ import SalesSidebar from './SalesSidebar';
 import SalesDashboard from './SalesDashboard';
 import SalesClientes from './SalesClientes';
 import SalesVentas from './SalesVentas';
-import SalesProductos from './SalesProductos';
+import AdminProducts from '../AdminPanel/AdminProducts';
 import ReportesGenerales from '../ReportesGenerales/ReportesGenerales';
 import SalesConfiguracion from './SalesConfiguracion';
 import { RefreshProvider } from '../../context/RefreshContext';
@@ -39,7 +39,7 @@ const SalesPanel = () => {
         <div className={styles.content}>
           {activeSection === 'inicio' && <SalesDashboard onNavigate={setActiveSection} />}
           {activeSection === 'clientes' && <SalesClientes />}
-          {activeSection === 'productos' && <SalesProductos />}
+          {activeSection === 'productos' && <AdminProducts />}
           {activeSection === 'ventas' && <SalesVentas />}
           {activeSection === 'reportes' && <ReportesGenerales />}
           {activeSection === 'configuracion' && <SalesConfiguracion />}
