@@ -1,13 +1,11 @@
-import { Resend } from 'resend';
 import { logger } from './logger';
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const resendConfigured = !!(resendApiKey && !resendApiKey.startsWith('tu_'));
-
-const resend = resendConfigured ? new Resend(resendApiKey!) : null;
+const BREVO_API = 'https://api.brevo.com/v3/smtp/email';
+const brevoApiKey = process.env.BREVO_API_KEY;
+const brevoConfigured = !!(brevoApiKey && !brevoApiKey.startsWith('tu_'));
 
 const appName = 'American Certification Service';
-const fromEmail = process.env.RESEND_FROM || 'onboarding@resend.dev';
+const fromEmail = process.env.BREVO_FROM || 'noreply@acsperu.com';
 
 function buildHtml(code: string): string {
   return `
@@ -125,12 +123,50 @@ function extractCode(html: string): string {
   return html.match(/\d{6}/)?.[0] || '(sin código visible)';
 }
 
-function logToConsole(to: string, subject: string, code: string, prefix: string): void {
+function logToConsole(to: string, subject: string, code: string): void {
   console.log(`\n===========================================`);
-  console.log(`[${prefix}] Email a: ${to}`);
-  console.log(`[${prefix}] Asunto: ${subject}`);
-  console.log(`[${prefix}] Código: ${code}`);
+  console.log(`[BREVO] Email a: ${to}`);
+  console.log(`[BREVO] Asunto: ${subject}`);
+  console.log(`[BREVO] Código: ${code}`);
   console.log(`===========================================\n`);
+}
+
+async function sendViaBrevo(
+  to: string,
+  subject: string,
+  htmlContent: string,
+  attachment?: { filename: string; content: Buffer; contentType: string },
+): Promise<void> {
+  const payload: any = {
+    sender: { name: appName, email: fromEmail },
+    to: [{ email: to }],
+    subject,
+    htmlContent,
+  };
+
+  if (attachment) {
+    payload.attachment = [
+      {
+        name: attachment.filename,
+        content: attachment.content.toString('base64'),
+      },
+    ];
+  }
+
+  const res = await fetch(BREVO_API, {
+    method: 'POST',
+    headers: {
+      'api-key': brevoApiKey!,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`Brevo error ${res.status}: ${errBody}`);
+  }
 }
 
 async function trySend(
@@ -140,33 +176,17 @@ async function trySend(
   attachment?: { filename: string; content: Buffer; contentType: string },
 ): Promise<void> {
   const code = extractCode(html);
+  logToConsole(to, subject, code);
 
-  // Always log to console so the code is visible in Railway logs
-  logToConsole(to, subject, code, resendConfigured ? 'RESEND' : 'DEV');
-
-  if (!resendConfigured || !resend) {
+  if (!brevoConfigured) {
     return;
   }
 
   try {
-    const payload: any = {
-      from: fromEmail,
-      to,
-      subject,
-      html,
-    };
-    if (attachment) {
-      payload.attachments = [
-        {
-          filename: attachment.filename,
-          content: attachment.content.toString('base64'),
-        },
-      ];
-    }
-    await resend.emails.send(payload);
-    logger.info({ to, subject }, 'Correo enviado exitosamente vía Resend');
+    await sendViaBrevo(to, subject, html, attachment);
+    logger.info({ to, subject }, 'Correo enviado exitosamente vía Brevo');
   } catch (err) {
-    logger.error({ err, to, subject }, 'Error enviando correo vía Resend');
+    logger.error({ err, to, subject }, 'Error enviando correo vía Brevo');
   }
 }
 
