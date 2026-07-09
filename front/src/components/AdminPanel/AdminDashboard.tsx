@@ -85,9 +85,9 @@ const AdminDashboard = ({ onNavigate }: { onNavigate: (section: string) => void 
     { label: 'Usuarios Activos', value: s.activos ?? 0, icon: <FaUserCheck />, color: '#10b981', bg: '#10b98115', section: 'usuarios', change: `${((s.activos / (s.total || 1)) * 100).toFixed(0)}% del total` },
     { label: 'Nuevos (Hoy)', value: s.newUsersToday ?? 0, icon: <FaUserPlus />, color: '#3b82f6', bg: '#3b82f615', section: 'usuarios', change: s.newUsersThisMonth ? `${s.newUsersThisMonth} este mes` : '0 este mes' },
     { label: 'Clientes', value: s.totalClientes ?? 0, icon: <FaUserSlash />, color: '#f59e0b', bg: '#f59e0b15', section: 'usuarios', change: s.newClientesThisMonth ? `+${s.newClientesThisMonth} nuevos` : '0 nuevos' },
-    { label: 'Ventas Totales', value: s.sales?.total ?? 0, icon: <FaShoppingCart />, color: '#3b82f6', bg: '#3b82f615', section: 'pedidos', change: `S/ ${(s.sales?.ingresos ?? 0).toFixed(2)} ingresos` },
+    { label: 'Ventas Totales', value: s.orderStats?.total ?? 0, icon: <FaShoppingCart />, color: '#3b82f6', bg: '#3b82f615', section: 'pedidos', change: `S/ ${(s.orderStats?.ingresos ?? 0).toFixed(2)} ingresos` },
     { label: 'Ventas Hoy', value: s.salesToday ?? 0, icon: <FaCalendarDay />, color: '#10b981', bg: '#10b98115', section: 'pedidos', change: `+${s.salesThisMonth ?? 0} este mes` },
-    { label: 'Ingresos', value: `S/ ${(s.sales?.ingresos ?? 0).toFixed(2)}`, icon: <FaDollarSign />, color: '#f59e0b', bg: '#f59e0b15', section: 'pedidos', change: 'Ingresos totales' },
+    { label: 'Ingresos', value: `S/ ${(s.orderStats?.ingresos ?? 0).toFixed(2)}`, icon: <FaDollarSign />, color: '#f59e0b', bg: '#f59e0b15', section: 'pedidos', change: 'Ingresos totales' },
     { label: 'Tasa Éxito Login', value: `${s.loginStats?.successRate ?? 0}%`, icon: <FaPercent />, color: '#10b981', bg: '#10b98115', section: 'seguridad', change: `${s.loginStats?.last24h ?? 0} intentos últ. 24h` },
     { label: 'Notificaciones', value: notifCount, icon: <FaBell />, color: '#dc2626', bg: '#dc262615', section: 'notificaciones', change: notifCount === 1 ? '1 sin leer' : `${notifCount} sin leer` },
   ];

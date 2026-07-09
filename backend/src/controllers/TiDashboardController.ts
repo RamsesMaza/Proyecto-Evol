@@ -180,7 +180,7 @@ export const TiDashboardController = {
         loginStats,
         ticketStats,
         recentActivity: audits,
-        sales: orderStats,
+        orderStats,
         newUsersThisMonth,
         newUsersToday,
         salesToday,

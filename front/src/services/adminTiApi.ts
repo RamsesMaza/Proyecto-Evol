@@ -14,6 +14,15 @@ export interface TiDashboardStats {
   loginStats: { total: number; failed: number; last24h: number; successRate: number };
   ticketStats: { abiertos: number; enProgreso: number; resueltos: number; cerrados: number; total: number };
   recentActivity: any[];
+  orderStats: { total: number; paid: number; pending: number; cancelled: number; ingresos: number; esteMes: number };
+  newUsersThisMonth: number;
+  newUsersToday: number;
+  salesToday: number;
+  salesThisMonth: number;
+  totalClientes: number;
+  newClientesThisMonth: number;
+  last7Orders: any[];
+  charts: { salesByDay: any[]; userGrowth: any[]; dailyLogins: any[] };
 }
 
 export function fetchTiDashboardStats(): Promise<TiDashboardStats> {
