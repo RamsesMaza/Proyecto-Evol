@@ -9,6 +9,7 @@ export interface OrderStats {
   pending: number;
   cancelled: number;
   ingresos: number;
+  esteMes: number;
 }
 
 export async function fetchOrders(params: {

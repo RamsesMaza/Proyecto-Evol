@@ -50,7 +50,7 @@ export async function deleteCliente(id: number | string): Promise<void> {
   await http(BASE, `/${id}`, { method: 'DELETE' });
 }
 
-export async function fetchClientesStats(): Promise<{ stats: ClienteStats }> {
+export async function fetchClientesStats(): Promise<ClienteStats> {
   return http(BASE, '/stats');
 }
 
