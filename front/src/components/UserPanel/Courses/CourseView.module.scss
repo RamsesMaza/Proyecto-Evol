@@ -2,6 +2,7 @@
 
 .wrapper {
   animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+  padding: 24px;
 }
 
 @keyframes fadeIn {
@@ -176,6 +177,7 @@
   display: flex;
   gap: 24px;
   align-items: flex-start;
+  padding: 0 4px;
 }
 
 .leftCol {
@@ -355,7 +357,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
+  padding: 10px 14px;
   border-radius: 8px;
   transition: background 0.12s;
 
@@ -462,7 +464,7 @@
   background: #fff;
   border-radius: 12px;
   border: 1px solid #f1f5f9;
-  padding: 16px;
+  padding: 20px;
 }
 
 .sideTitle {

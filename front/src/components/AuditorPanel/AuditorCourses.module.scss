@@ -2,6 +2,7 @@
 
 .wrapper {
   animation: fadeSlide 0.3s ease both;
+  padding: 24px;
 }
 
 @keyframes fadeSlide {
@@ -244,7 +245,7 @@
 .statusDraft { background: rgba(245,158,11,0.85); color: #fff; }
 
 .courseCardBody {
-  padding: 16px;
+  padding: 20px;
 }
 
 .courseCardTitle {
@@ -522,7 +523,7 @@
 .modulesList {
   flex: 1;
   overflow-y: auto;
-  padding: 6px;
+  padding: 12px;
 }
 
 .modulesEmpty {
