@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { PageSkeleton } from "../components/ui/Skeleton";
+import { RouteGuard, PublicGuard } from "../components/RouteGuard";
 
 const Home = lazy(() => import("../pages/Home"));
 const Nosotros = lazy(() => import("../pages/Nosotros"));
@@ -86,9 +87,11 @@ const AppRouter = () => (
     <Route
       path="/login"
       element={
-        <Suspense fallback={<PageSkeleton variant="login" />}>
-          <Auth />
-        </Suspense>
+        <PublicGuard>
+          <Suspense fallback={<PageSkeleton variant="login" />}>
+            <Auth />
+          </Suspense>
+        </PublicGuard>
       }
     />
     <Route
@@ -124,11 +127,13 @@ const AppRouter = () => (
       }
     />
     <Route
-      path="/panel"
+      path="/panel/*"
       element={
-        <Suspense fallback={<PageSkeleton variant="panel" />}>
-          <UserPanel />
-        </Suspense>
+        <RouteGuard>
+          <Suspense fallback={<PageSkeleton variant="panel" />}>
+            <UserPanel />
+          </Suspense>
+        </RouteGuard>
       }
     />
     <Route

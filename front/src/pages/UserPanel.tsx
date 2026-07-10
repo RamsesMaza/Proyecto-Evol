@@ -1,4 +1,5 @@
 import { useAuth } from "../context/AuthContext";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import UserPanel from "../components/UserPanel/UserPanel";
 import SalesPanel from "../components/SalesPanel/SalesPanel";
 import AdminTiPanel from "../components/AdminTiPanel/AdminTiPanel";
@@ -7,12 +8,14 @@ import MarketingPanel from "../components/MarketingPanel/MarketingPanel";
 import AuditorPanel from "../components/AuditorPanel/AuditorPanel";
 
 const PanelRouter = () => {
-  const { user } = useAuth();
-  if (user?.role === "SALES") return <SalesPanel />;
-  if (user?.role === "TI") return <AdminTiPanel />;
-  if (user?.role === "ADMIN") return <AdminPanel />;
-  if (user?.role === "MARKETING") return <MarketingPanel />;
-  if (user?.role === "AUDITOR") return <AuditorPanel />;
+  const { user, loading } = useAuth();
+  if (loading) return <PageSkeleton variant="panel" />;
+  if (!user) return null;
+  if (user.role === "SALES") return <SalesPanel />;
+  if (user.role === "TI") return <AdminTiPanel />;
+  if (user.role === "ADMIN") return <AdminPanel />;
+  if (user.role === "MARKETING") return <MarketingPanel />;
+  if (user.role === "AUDITOR") return <AuditorPanel />;
   return <UserPanel />;
 };
 
