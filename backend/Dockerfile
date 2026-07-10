@@ -3,6 +3,8 @@ WORKDIR /app
 COPY front/package.json front/package-lock.json ./
 RUN npm install
 COPY front/ .
+ARG VITE_RECAPTCHA_SITE_KEY
+ENV VITE_RECAPTCHA_SITE_KEY=$VITE_RECAPTCHA_SITE_KEY
 RUN npx vite build
 
 FROM node:20-alpine AS builder
