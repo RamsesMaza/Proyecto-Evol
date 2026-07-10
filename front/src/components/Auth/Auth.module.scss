@@ -546,6 +546,12 @@
   @include flex-center-x;
 }
 
+.captchaWrap {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
 .captchaDisclaimer {
   margin: 15px 0 25px;
   font-size: 0.75rem;

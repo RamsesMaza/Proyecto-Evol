@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import ReCAPTCHA from 'react-google-recaptcha';
 import styles from './Auth.module.scss';
 import { validateEmail, validatePassword } from '../../utils/validators';
 
@@ -20,7 +20,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const codeInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -83,14 +83,16 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
       return;
     }
 
-    if (!executeRecaptcha) {
-      setError('ReCAPTCHA no está listo. Por favor, intenta de nuevo.');
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
       return;
     }
+    recaptchaRef.current?.reset();
 
     setLoading(true);
     try {
-      const token = await executeRecaptcha('forgot_password_step1');
+
       const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,12 +117,14 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
   const handleResendCode = async () => {
     if (cooldown > 0 || resending) return;
 
-    if (!executeRecaptcha) return;
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) return;
+    recaptchaRef.current?.reset();
 
     setResending(true);
     setError('');
     try {
-      const token = await executeRecaptcha('forgot_password_resend');
+
       const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,14 +155,16 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
       return;
     }
 
-    if (!executeRecaptcha) {
-      setError('ReCAPTCHA no está listo. Por favor, intenta de nuevo.');
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
       return;
     }
+    recaptchaRef.current?.reset();
 
     setLoading(true);
     try {
-      const token = await executeRecaptcha('verify_otp');
+
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -200,14 +206,16 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
       return;
     }
 
-    if (!executeRecaptcha) {
-      setError('ReCAPTCHA no está listo. Por favor, intenta de nuevo.');
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
       return;
     }
+    recaptchaRef.current?.reset();
 
     setLoading(true);
     try {
-      const token = await executeRecaptcha('reset_password');
+
       const fullCode = code.join('');
       const res = await fetch('/api/auth/reset-password', {
         method: 'POST',
@@ -272,6 +280,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
               />
             </div>
             {error && <p className={`${styles.errorText} ${styles.animatedGroup}`}>{error}</p>}
+            <div className={styles.captchaWrap}>
+              <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} />
+            </div>
             <button
               type="submit"
               className={`${styles.submitBtn} ${styles.animatedGroup}`}
@@ -303,6 +314,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
               ))}
             </div>
             {error && <p className={`${styles.errorText} ${styles.animatedGroup}`}>{error}</p>}
+            <div className={styles.captchaWrap}>
+              <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} />
+            </div>
             <button
               type="submit"
               className={`${styles.submitBtn} ${styles.animatedGroup}`}
@@ -346,6 +360,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
               />
             </div>
             {error && <p className={`${styles.errorText} ${styles.animatedGroup}`}>{error}</p>}
+            <div className={styles.captchaWrap}>
+              <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} />
+            </div>
             <button
               type="submit"
               className={`${styles.submitBtn} ${styles.animatedGroup}`}
@@ -358,7 +375,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSwitchMode, o
 
         {step === 1 && (
           <div className={`${styles.captchaDisclaimer} ${styles.animatedGroup}`} style={{ marginTop: '20px' }}>
-            Protegido por reCAPTCHA invisible. Aplican la{' '}
+            Protegido por reCAPTCHA. Aplican la{' '}
             <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacidad</a> y{' '}
             <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Términos</a> de Google.
           </div>

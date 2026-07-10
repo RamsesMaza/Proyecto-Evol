@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import React, { useState, useEffect, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '../../context/AuthContext';
 import TwoFactorForm from './TwoFactorForm';
 import styles from './Auth.module.scss';
@@ -16,7 +16,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
   const { setTwoFactorChallenge, clearTwoFactorChallenge } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [error, setError] = useState('');
   const [show2FA, setShow2FA] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
@@ -46,12 +46,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
       return;
     }
 
-    if (!executeRecaptcha) {
-      setError('ReCAPTCHA no está listo. Por favor, intenta de nuevo en unos segundos.');
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
       return;
     }
-
-    const captchaToken = await executeRecaptcha('login');
+    recaptchaRef.current?.reset();
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -124,6 +124,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
 
           {error && <p className={styles.errorText}>{error}</p>}
 
+          <div className={styles.captchaWrap}>
+            <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} />
+          </div>
+
           <div className={`${styles.divider} ${styles.animatedGroup}`}>o</div>
 
           <button type="button" className={`${styles.googleBtn} ${styles.animatedGroup}`} onClick={() => window.location.href = '/api/auth/google'}>
@@ -131,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchMode, onSuccess }) => {
           </button>
 
           <div className={`${styles.captchaDisclaimer} ${styles.animatedGroup}`}>
-            Protegido por reCAPTCHA invisible. Aplican la{' '}
+            Protegido por reCAPTCHA. Aplican la{' '}
             <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacidad</a> y{' '}
             <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Términos</a> de Google.
           </div>

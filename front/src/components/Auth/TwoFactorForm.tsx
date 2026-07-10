@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Auth.module.scss';
 
@@ -15,7 +15,7 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel, email }) => {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const codeInputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -81,14 +81,16 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel, email }) => {
       return;
     }
 
-    if (!executeRecaptcha) {
-      setError('ReCAPTCHA no está listo.');
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) {
+      setError('Por favor, verifica que no eres un robot.');
       return;
     }
+    recaptchaRef.current?.reset();
 
     setLoading(true);
     try {
-      const captchaToken = await executeRecaptcha('verify_2fa');
+
       const res = await fetch('/api/auth/verify-2fa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -120,12 +122,14 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel, email }) => {
 
   const handleResend = async () => {
     if (cooldown > 0 || resending || !partialToken) return;
-    if (!executeRecaptcha) return;
+    const captchaToken = recaptchaRef.current?.getValue();
+    if (!captchaToken) return;
+    recaptchaRef.current?.reset();
 
     setResending(true);
     setError('');
     try {
-      const captchaToken = await executeRecaptcha('resend_2fa');
+
       const res = await fetch('/api/auth/2fa/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -182,6 +186,9 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel, email }) => {
             ))}
           </div>
           {error && <p className={`${styles.errorText} ${styles.animatedGroup}`}>{error}</p>}
+          <div className={styles.captchaWrap}>
+            <ReCAPTCHA ref={recaptchaRef} sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} />
+          </div>
           <button
             type="submit"
             className={`${styles.submitBtn} ${styles.animatedGroup}`}
