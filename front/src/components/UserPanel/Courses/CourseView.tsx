@@ -36,7 +36,7 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
   const modules = Array.isArray(course?.modules) ? course.modules : [];
 
   const totalMaterials = useMemo(
-    () => modules.reduce((sum: number, m: any) => sum + (m.materials?.length || 0), 0),
+    () => Array.isArray(modules) ? modules.reduce((sum: number, m: any) => sum + (m.materials?.length || 0), 0) : 0,
     [modules]
   );
 

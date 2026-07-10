@@ -224,12 +224,12 @@ const AuditorCourses = () => {
         await deleteMaterial(deleteTarget.id);
         setActiveModules(prev => prev.map(m => ({
           ...m,
-          materials: m.materials.filter(mat => mat.id !== deleteTarget.id),
+          materials: Array.isArray(m.materials) ? m.materials.filter(mat => mat.id !== deleteTarget.id) : [],
         })));
         if (selectedModule) {
           setSelectedModule(prev => prev ? {
             ...prev,
-            materials: prev.materials.filter(mat => mat.id !== deleteTarget.id),
+            materials: Array.isArray(prev.materials) ? prev.materials.filter(mat => mat.id !== deleteTarget.id) : [],
           } : null);
         }
       }
@@ -242,7 +242,7 @@ const AuditorCourses = () => {
     if (!activeCourse) return;
     try {
       const mod = await addModule(activeCourse.id, { title: 'Nuevo Módulo', description: '' });
-      setActiveModules(prev => [...prev, mod]);
+      setActiveModules(prev => [...prev, { ...mod, materials: mod.materials || [] }]);
       setSelectedModule(mod);
       setEditingModuleId(mod.id);
       setModuleEditTitle(mod.title);
@@ -306,12 +306,13 @@ const AuditorCourses = () => {
       }
       const updateMods = (prev: CourseModule[]) => prev.map(m => {
         if (m.id === materialModuleId) {
-          const exists = m.materials.some(x => x.id === saved.id);
+          const mats = Array.isArray(m.materials) ? m.materials : [];
+          const exists = mats.some(x => x.id === saved.id);
           return {
             ...m,
             materials: exists
-              ? m.materials.map(x => x.id === saved.id ? saved : x)
-              : [...m.materials, saved],
+              ? mats.map(x => x.id === saved.id ? saved : x)
+              : [...mats, saved],
           };
         }
         return m;
@@ -474,7 +475,7 @@ const AuditorCourses = () => {
               {activeCourse?.category && <span>{activeCourse.category}</span>}
               <span className={styles.manageLevel} style={{ background: activeLvl.bg, color: activeLvl.color }}>{activeCourse?.level}</span>
               <span>{activeModules.length} módulos</span>
-              <span>{activeModules.reduce((s, m) => s + m.materials.length, 0)} materiales</span>
+              <span>{activeModules.reduce((s, m) => s + (m.materials?.length || 0), 0)} materiales</span>
             </div>
           </div>
         </div>
