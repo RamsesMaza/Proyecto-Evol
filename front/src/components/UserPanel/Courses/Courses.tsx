@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { FaSearch, FaTh, FaList, FaHeart, FaBookOpen, FaUserTie, FaLaptop, FaBuilding, FaExternalLinkAlt, FaStar, FaCompass, FaBookmark, FaCheck, FaSpinner } from 'react-icons/fa';
+import { FaSearch, FaTh, FaList, FaHeart, FaBookOpen, FaUserTie, FaLaptop, FaBuilding, FaExternalLinkAlt, FaStar, FaCompass, FaBookmark, FaCheck, FaSpinner, FaClock, FaGraduationCap, FaFire, FaChevronRight, FaPlay } from 'react-icons/fa';
 import { fetchMyCourses, fetchAvailableCourses, enrollCourse, type Course, type CourseEnrollment } from '../../../services/coursesApi';
 import CourseView from './CourseView';
 import styles from './Courses.module.scss';
@@ -90,32 +90,41 @@ const Courses = ({ onContactInstructor }: CoursesProps) => {
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.heroIcon}><FaGraduationCap /></div>
+          <div>
+            <h1 className={styles.heroTitle}>Aprendizaje y Desarrollo</h1>
+            <p className={styles.heroSub}>Accede a cursos diseñados para tu crecimiento profesional</p>
+          </div>
+        </div>
+        <div className={styles.heroStats}>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatValue}>{enrollments.length}</span>
+            <span className={styles.heroStatLabel}>Inscritos</span>
+          </div>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatValue}>{availableCourses.length}</span>
+            <span className={styles.heroStatLabel}>Disponibles</span>
+          </div>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatValue}>{favorites.length}</span>
+            <span className={styles.heroStatLabel}>Favoritos</span>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.tabRow}>
         <button className={`${styles.tab} ${tab === 'mis-cursos' ? styles.tabActive : ''}`}
           onClick={() => setTab('mis-cursos')}>
           <FaBookmark /> Mis Cursos
+          {enrollments.length > 0 && <span className={styles.tabCount}>{enrollments.length}</span>}
         </button>
         <button className={`${styles.tab} ${tab === 'explorar' ? styles.tabActive : ''}`}
           onClick={() => setTab('explorar')}>
           <FaCompass /> Explorar
+          {availableCourses.length > 0 && <span className={styles.tabCount}>{availableCourses.length}</span>}
         </button>
-      </div>
-
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <div className={styles.headerIcon}><FaBookOpen /></div>
-          <div>
-            <h1 className={styles.headerTitle}>Cursos</h1>
-            <p className={styles.headerSub}>{tab === 'mis-cursos' ? 'Mis Cursos' : 'Cursos Disponibles'}</p>
-          </div>
-        </div>
-        <div className={styles.headerRight}>
-          <span className={styles.resultCount}>{filtered.length} resultados</span>
-          <div className={styles.viewTabs}>
-            <button className={`${styles.viewTab} ${view === 'grid' ? styles.viewTabActive : ''}`} onClick={() => setView('grid')}><FaTh /></button>
-            <button className={`${styles.viewTab} ${view === 'list' ? styles.viewTabActive : ''}`} onClick={() => setView('list')}><FaList /></button>
-          </div>
-        </div>
       </div>
 
       <div className={styles.toolbar}>
@@ -123,28 +132,34 @@ const Courses = ({ onContactInstructor }: CoursesProps) => {
           <FaSearch className={styles.searchIcon} />
           <input className={styles.searchInput} type="text" placeholder="Buscar cursos..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <div className={styles.filterGroup}>
-          {categories.map(cat => (
-            <button key={cat} className={`${styles.filterBtn} ${filterCategory === cat ? styles.filterActive : ''}`} onClick={() => setFilterCategory(cat)}>{cat}</button>
-          ))}
+        <div className={styles.toolbarRight}>
+          <div className={styles.filterGroup}>
+            {categories.map(cat => (
+              <button key={cat} className={`${styles.filterBtn} ${filterCategory === cat ? styles.filterActive : ''}`} onClick={() => setFilterCategory(cat)}>{cat}</button>
+            ))}
+          </div>
+          <div className={styles.viewTabs}>
+            <button className={`${styles.viewTab} ${view === 'grid' ? styles.viewTabActive : ''}`} onClick={() => setView('grid')} title="Vista cuadrícula"><FaTh /></button>
+            <button className={`${styles.viewTab} ${view === 'list' ? styles.viewTabActive : ''}`} onClick={() => setView('list')} title="Vista lista"><FaList /></button>
+          </div>
         </div>
       </div>
 
       {loading ? (
         <div className={styles.empty}>
           <div className={styles.emptyIcon}><FaSpinner className={styles.spinnerIcon} /></div>
-          <h3 className={styles.emptyTitle}>Cargando...</h3>
+          <h3 className={styles.emptyTitle}>Cargando cursos...</h3>
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
           <div className={styles.emptyIcon}><FaBookOpen /></div>
           <h3 className={styles.emptyTitle}>
-            {tab === 'mis-cursos' ? 'No hay cursos disponibles' : 'No hay cursos disponibles'}
+            {tab === 'mis-cursos' ? 'No estás inscrito en ningún curso' : 'No hay cursos disponibles'}
           </h3>
           <p className={styles.emptyText}>
             {tab === 'mis-cursos'
-              ? 'Inscríbete en cursos desde la pestaña Explorar'
-              : 'No hay cursos publicados para tu perfil'}
+              ? 'Explora cursos disponibles y comienza tu aprendizaje'
+              : 'No hay cursos publicados para tu perfil en este momento'}
           </p>
         </div>
       ) : (
@@ -157,11 +172,14 @@ const Courses = ({ onContactInstructor }: CoursesProps) => {
             const enrollment = tab === 'mis-cursos' ? (item as CourseEnrollment) : null;
             return (
               <div key={cid} className={`${view === 'grid' ? styles.card : styles.listCard}`} style={{ animationDelay: `${idx * 0.04}s` }}>
-                <div className={view === 'grid' ? styles.cardThumb : styles.listThumb}>
+                <div className={view === 'grid' ? styles.cardThumb : styles.listThumb} style={{ background: `${color}15` }}>
                   {c.imageUrl ? (
                     <img src={c.imageUrl} alt={c.title} className={styles.cardImg} />
                   ) : (
-                    <div className={styles.cardImgPlaceholder} style={{ background: `${color}11`, color }}>{c.title.charAt(0)}</div>
+                    <div className={styles.cardImgPlaceholder} style={{ color }}>
+                      {c.title.charAt(0)}
+                      <div className={styles.cardImgGradient} style={{ background: `linear-gradient(135deg, ${color}20, ${color}05)` }} />
+                    </div>
                   )}
                   <span className={styles.cardType} style={{ background: c.level === 'virtual' ? 'rgba(37,99,235,0.12)' : 'rgba(16,185,129,0.12)', color: c.level === 'virtual' ? '#2563eb' : '#10b981' }}>
                     {c.level === 'virtual' ? <FaLaptop /> : <FaBuilding />} {c.level || 'Presencial'}
@@ -169,6 +187,11 @@ const Courses = ({ onContactInstructor }: CoursesProps) => {
                   <button className={`${styles.favBtn} ${isFav ? styles.favActive : ''}`} onClick={() => toggleFav(c.id)}>
                     <FaHeart />
                   </button>
+                  {enrollment && (
+                    <div className={styles.cardProgress}>
+                      <div className={styles.cardProgressFill} style={{ width: `${enrollment.progress}%` }} />
+                    </div>
+                  )}
                 </div>
                 <div className={view === 'grid' ? styles.cardBody : styles.listBody}>
                   <span className={styles.cardCode}>{c.category || 'General'}</span>
@@ -177,17 +200,30 @@ const Courses = ({ onContactInstructor }: CoursesProps) => {
                     <FaUserTie className={styles.cardInstructorIcon} />
                     <span>{c.creator ? `${c.creator.firstName} ${c.creator.lastName}` : 'Instructor'}</span>
                   </div>
+                  {c.description && (
+                    <p className={styles.cardDesc}>{c.description}</p>
+                  )}
                   <div className={styles.cardFooter}>
                     <div className={styles.cardMeta}>
-                      <span className={styles.cardRating}><FaStar /> {c.level}</span>
                       {enrollment ? (
-                        <span className={styles.cardStudents}>{enrollment.progress}%</span>
+                        <span className={styles.cardProgressText}>
+                          <FaClock /> {enrollment.progress}% completado
+                        </span>
                       ) : (
-                        <span className={styles.cardStudents}><FaBookOpen /> {c._count?.modules || 0} módulos</span>
+                        <span className={styles.cardModules}>
+                          <FaBookOpen /> {c._count?.modules || 0} módulos
+                        </span>
+                      )}
+                      {c.duration && (
+                        <span className={styles.cardDuration}>
+                          <FaClock /> {c.duration}h
+                        </span>
                       )}
                     </div>
                     {tab === 'mis-cursos' ? (
-                      <button className={styles.openBtn} onClick={() => setSelectedCourse(c)}>Abrir <FaExternalLinkAlt /></button>
+                      <button className={styles.openBtn} onClick={() => setSelectedCourse(c)}>
+                        {enrollment && enrollment.progress > 0 ? 'Continuar' : 'Comenzar'} <FaPlay />
+                      </button>
                     ) : (
                       <button className={styles.enrollBtn}
                         disabled={enrolling === cid}

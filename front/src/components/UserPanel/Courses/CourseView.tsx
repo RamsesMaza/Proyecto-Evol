@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { FaArrowLeft, FaFilePdf, FaLink, FaBook, FaCheckCircle, FaRegCircle, FaPlayCircle, FaDownload, FaExternalLinkAlt, FaChevronDown, FaUserTie, FaChartBar, FaClock, FaAward, FaFolder, FaClipboardList, FaFilePowerpoint, FaStar, FaMedal, FaBookOpen, FaFire, FaLaptop, FaBuilding, FaTimes, FaVideo, FaSpinner, FaEnvelope } from 'react-icons/fa';
-import { fetchCourse } from '../../../services/coursesApi';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { FaArrowLeft, FaFilePdf, FaLink, FaBook, FaCheckCircle, FaRegCircle, FaPlayCircle, FaDownload, FaChevronDown, FaUserTie, FaChartBar, FaClock, FaFolder, FaBookOpen, FaLaptop, FaBuilding, FaTimes, FaVideo, FaSpinner, FaEnvelope, FaFilePowerpoint } from 'react-icons/fa';
+import { fetchCourse, updateProgress, type Course, type CourseModule, type CourseMaterial } from '../../../services/coursesApi';
 import styles from './CourseView.module.scss';
 
 interface Props {
@@ -16,8 +16,15 @@ const resourceIcons: Record<string, JSX.Element> = {
 const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Props) => {
   const [course, setCourse] = useState<any>(initialCourse);
   const [loading, setLoading] = useState(true);
-  const [expandedWeeks, setExpandedWeeks] = useState<number[]>([]);
+  const [expandedWeeks, setExpandedWeeks] = useState<number[]>([0]);
   const [showVideo, setShowVideo] = useState(false);
+  const [completedMaterials, setCompletedMaterials] = useState<Set<number>>(() => {
+    try {
+      const stored = localStorage.getItem(`course_${initialCourse.id}_completed`);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+  const [savingProgress, setSavingProgress] = useState(false);
 
   useEffect(() => {
     fetchCourse(initialCourse.id)
@@ -27,6 +34,38 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
   }, [initialCourse.id]);
 
   const modules = course?.modules || [];
+
+  const totalMaterials = useMemo(
+    () => modules.reduce((sum: number, m: any) => sum + (m.materials?.length || 0), 0),
+    [modules]
+  );
+
+  const progress = useMemo(
+    () => totalMaterials > 0 ? Math.min(Math.round((completedMaterials.size / totalMaterials) * 100), 100) : 0,
+    [completedMaterials.size, totalMaterials]
+  );
+
+  const toggleMaterial = useCallback(async (matId: number) => {
+    setCompletedMaterials(prev => {
+      const next = new Set(prev);
+      if (next.has(matId)) next.delete(matId); else next.add(matId);
+      localStorage.setItem(`course_${initialCourse.id}_completed`, JSON.stringify([...next]));
+      return next;
+    });
+  }, [initialCourse.id]);
+
+  useEffect(() => {
+    if (!loading && totalMaterials > 0) {
+      const timer = setTimeout(async () => {
+        setSavingProgress(true);
+        try {
+          await updateProgress(initialCourse.id, progress);
+        } catch (e) { /* silencio */ }
+        finally { setSavingProgress(false); }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [progress, loading, totalMaterials, initialCourse.id]);
 
   const color = '#7c3aed';
 
@@ -42,10 +81,11 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
     setExpandedWeeks(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]);
   };
 
-  const totalMaterials = modules.reduce((sum: number, m: any) => sum + (m.materials?.length || 0), 0);
-  const completedActivities = 0;
-  const totalActivities = totalMaterials;
-  const progress = modules.length > 0 ? Math.min(Math.round((completedActivities / Math.max(totalActivities, 1)) * 100), 100) : 0;
+  const moduleProgress = (mod: any) => {
+    if (!mod.materials || mod.materials.length === 0) return 0;
+    const done = mod.materials.filter((m: any) => completedMaterials.has(m.id)).length;
+    return Math.round((done / mod.materials.length) * 100);
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -65,7 +105,9 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
                 {course.creator && (
                   <span className={styles.headerInstructor}><FaUserTie /> {course.creator.firstName} {course.creator.lastName}</span>
                 )}
-                <span className={styles.headerRating}><FaStar /> {course.level}</span>
+                {course.duration && (
+                  <span className={styles.headerDuration}><FaClock /> {course.duration}h</span>
+                )}
               </div>
             </div>
           </div>
@@ -84,10 +126,6 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
 
       <div className={styles.body}>
         <div className={styles.leftCol}>
-          <button className={styles.videoBtn} onClick={() => setShowVideo(true)}>
-            <FaVideo /> Iniciar Videoconferencia
-          </button>
-
           {modules.length === 0 ? (
             <div className={styles.weekEmpty}>
               <FaClock /> Contenido próximamente.
@@ -96,15 +134,25 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
             modules.map((mod: any, idx: number) => {
               const isOpen = expandedWeeks.includes(idx);
               const materials = mod.materials || [];
+              const mProgress = moduleProgress(mod);
               return (
                 <div key={mod.id || idx} className={`${styles.weekCard} ${isOpen ? styles.weekOpen : ''}`}>
                   <button className={styles.weekHeader} onClick={() => toggleWeek(idx)}>
                     <div className={styles.weekInfo}>
-                      <span className={styles.weekNum}>Módulo {idx + 1}</span>
+                      <div className={styles.weekNumRow}>
+                        <FaFolder className={styles.weekFolderIcon} />
+                        <span className={styles.weekNum}>Módulo {idx + 1}</span>
+                      </div>
                       <span className={styles.weekTitle}>{mod.title}</span>
                     </div>
                     <div className={styles.weekRight}>
-                      {materials.length > 0 && <FaCheckCircle className={styles.weekDone} />}
+                      {materials.length > 0 && (
+                        <div className={styles.weekProgressMini}>
+                          <div className={styles.weekProgressMiniFill} style={{ width: `${mProgress}%` }} />
+                        </div>
+                      )}
+                      {mProgress === 100 && materials.length > 0 && <FaCheckCircle className={styles.weekDone} />}
+                      <span className={styles.weekMatCount}>{completedMaterials.size} de {totalMaterials}</span>
                       <FaChevronDown className={`${styles.weekChevron} ${isOpen ? styles.chevronOpen : ''}`} />
                     </div>
                   </button>
@@ -114,27 +162,29 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
                     ) : (
                       <div className={styles.weekSections}>
                         <div className={styles.section}>
-                          <div className={styles.sectionHeader}>
-                            <FaFolder className={styles.sectionIcon} />
-                            <span>Materiales</span>
-                          </div>
                           <div className={styles.sectionList}>
-                            {materials.map((mat: any) => (
-                              <div key={mat.id} className={styles.sectionItem}>
-                                <span className={styles.itemIcon} style={{
-                                  color: mat.type === 'pdf' ? '#dc2626' : mat.type === 'video' ? '#7c3aed' : mat.type === 'link' ? '#2563eb' : '#10b981'
-                                }}>
-                                  {resourceIcons[mat.type] || <FaFilePowerpoint />}
-                                </span>
-                                <span className={styles.itemName}>{mat.title}</span>
-                                <span className={styles.itemMeta}>{mat.type}</span>
-                                {mat.fileUrl && (
-                                  <a href={mat.fileUrl} target="_blank" rel="noopener noreferrer" className={styles.itemBtn}>
-                                    <FaDownload />
-                                  </a>
-                                )}
-                              </div>
-                            ))}
+                            {materials.map((mat: any) => {
+                              const isCompleted = completedMaterials.has(mat.id);
+                              return (
+                                <div key={mat.id} className={`${styles.sectionItem} ${isCompleted ? styles.sectionItemDone : ''}`}>
+                                  <button className={styles.itemToggle} onClick={() => toggleMaterial(mat.id)} title={isCompleted ? 'Marcar como pendiente' : 'Marcar como completado'}>
+                                    {isCompleted ? <FaCheckCircle className={styles.itemCheckDone} /> : <FaRegCircle className={styles.itemCheck} />}
+                                  </button>
+                                  <span className={styles.itemIcon} style={{
+                                    color: mat.type === 'pdf' ? '#dc2626' : mat.type === 'video' ? '#7c3aed' : mat.type === 'link' ? '#2563eb' : '#10b981'
+                                  }}>
+                                    {resourceIcons[mat.type] || <FaFilePowerpoint />}
+                                  </span>
+                                  <span className={styles.itemName}>{mat.title}</span>
+                                  <span className={styles.itemMeta}>{mat.type}</span>
+                                  {mat.fileUrl && (
+                                    <a href={mat.fileUrl} target="_blank" rel="noopener noreferrer" className={styles.itemBtn}>
+                                      <FaDownload />
+                                    </a>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -166,25 +216,35 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
           </div>
 
           <div className={styles.sideCard}>
-            <h3 className={styles.sideTitle}><FaChartBar /> Progreso</h3>
+            <h3 className={styles.sideTitle}><FaChartBar /> Tu Progreso</h3>
             <div className={styles.progressBar}>
               <div className={styles.progressBarFill} style={{ width: `${progress}%`, background: color }} />
             </div>
             <div className={styles.progressStats}>
-              <div><span className={styles.statNum}>{completedActivities}</span><span className={styles.statLabel}>Completadas</span></div>
-              <div><span className={styles.statNum}>{totalActivities - completedActivities}</span><span className={styles.statLabel}>Pendientes</span></div>
-              <div><span className={styles.statNum}>{modules.length}</span><span className={styles.statLabel}>Módulos</span></div>
+              <div>
+                <span className={styles.statNum}>{completedMaterials.size}</span>
+                <span className={styles.statLabel}>Completados</span>
+              </div>
+              <div>
+                <span className={styles.statNum}>{totalMaterials - completedMaterials.size}</span>
+                <span className={styles.statLabel}>Pendientes</span>
+              </div>
+              <div>
+                <span className={styles.statNum}>{modules.length}</span>
+                <span className={styles.statLabel}>Módulos</span>
+              </div>
             </div>
+            {savingProgress && <span className={styles.savingHint}><FaSpinner className={styles.spinSmall} /> Guardando...</span>}
           </div>
 
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}><FaClock /> Acciones rápidas</h3>
             <button className={styles.quickBtn} style={{ color, borderColor: `${color}33` }} onClick={() => setShowVideo(true)}>
-              <FaVideo /> Iniciar Videoconferencia
+              <FaVideo /> Videoconferencia
             </button>
-            {course.duration && (
+            {course.description && (
               <div className={styles.quickInfo}>
-                <FaClock /> Duración: {course.duration} horas
+                <FaBookOpen /> {course.description}
               </div>
             )}
           </div>
