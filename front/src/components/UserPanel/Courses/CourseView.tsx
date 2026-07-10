@@ -33,7 +33,7 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
       .finally(() => setLoading(false));
   }, [initialCourse.id]);
 
-  const modules = course?.modules || [];
+  const modules = Array.isArray(course?.modules) ? course.modules : [];
 
   const totalMaterials = useMemo(
     () => modules.reduce((sum: number, m: any) => sum + (m.materials?.length || 0), 0),
@@ -55,7 +55,7 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
   }, [initialCourse.id]);
 
   useEffect(() => {
-    if (!loading && totalMaterials > 0) {
+    if (!loading && totalMaterials > 0 && initialCourse?.id) {
       const timer = setTimeout(async () => {
         setSavingProgress(true);
         try {
@@ -82,8 +82,8 @@ const CourseView = ({ course: initialCourse, onBack, onContactInstructor }: Prop
   };
 
   const moduleProgress = (mod: any) => {
-    if (!mod.materials || mod.materials.length === 0) return 0;
-    const done = mod.materials.filter((m: any) => completedMaterials.has(m.id)).length;
+    if (!mod || !Array.isArray(mod.materials) || mod.materials.length === 0) return 0;
+    const done = mod.materials.filter((m: any) => m && completedMaterials.has(m.id)).length;
     return Math.round((done / mod.materials.length) * 100);
   };
 
